@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>3D House - Sifen </title>
+    <title>Sifen - Inside</title>
 
     <!-- ===== STYLES ===== -->
     <style>
@@ -578,4 +578,1100 @@
             wallMatBoth
         );
         frontRight.position.set(houseWidth / 4 + 0.25, houseHeight / 2, houseDepth / 2);
-        frontRight.cast
+        frontRight.castShadow = true;
+        frontRight.receiveShadow = true;
+        houseGroup.add(frontRight);
+
+        const frontTop = new THREE.Mesh(
+            new THREE.BoxGeometry(1.6, 0.5, wallThick),
+            wallMatBoth
+        );
+        frontTop.position.set(0, houseHeight - 0.25, houseDepth / 2);
+        frontTop.castShadow = true;
+        frontTop.receiveShadow = true;
+        houseGroup.add(frontTop);
+
+        // Ceiling
+        const ceilMat = new THREE.MeshStandardMaterial({
+            color: 0xf5efe8,
+            roughness: 0.9,
+            metalness: 0.0,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.4,
+        });
+        const ceiling = new THREE.Mesh(
+            new THREE.PlaneGeometry(houseWidth - 0.4, houseDepth - 0.4),
+            ceilMat
+        );
+        ceiling.rotation.x = Math.PI / 2;
+        ceiling.position.set(0, houseHeight - 0.05, 0);
+        houseGroup.add(ceiling);
+
+        // Roof
+        const roofShape = new THREE.Shape();
+        const rw = houseWidth / 2 + 0.6;
+        const rh = 1.8;
+        roofShape.moveTo(-rw, 0);
+        roofShape.lineTo(0, rh);
+        roofShape.lineTo(rw, 0);
+        roofShape.lineTo(-rw, 0);
+        const extrudeSettings = {
+            steps: 1,
+            depth: houseDepth + 1.2,
+            bevelEnabled: true,
+            bevelThickness: 0.1,
+            bevelSize: 0.05,
+            bevelSegments: 4,
+        };
+        const roofGeo = new THREE.ExtrudeGeometry(roofShape, extrudeSettings);
+        const roofMat = new THREE.MeshStandardMaterial({
+            map: roofTex,
+            roughness: 0.9,
+            metalness: 0.0,
+            color: 0x6a4a3a,
+        });
+        const roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.position.set(0, houseHeight, -houseDepth / 2 - 0.6);
+        roof.castShadow = true;
+        roof.receiveShadow = true;
+        houseGroup.add(roof);
+
+        // ============================================================
+        //  DOOR
+        // ============================================================
+        const doorGroup = new THREE.Group();
+        doorGroup.position.set(0, 0, houseDepth / 2 - 0.05);
+        houseGroup.add(doorGroup);
+
+        const frameMat = new THREE.MeshStandardMaterial({
+            color: 0x5a3a2a,
+            roughness: 0.6,
+            metalness: 0.1,
+        });
+        const frame = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.5, 0.15), frameMat);
+        frame.position.set(0, 1.25, 0);
+        frame.castShadow = true;
+        doorGroup.add(frame);
+
+        const doorPanel = new THREE.Group();
+        doorPanel.position.set(0, 0, 0.1);
+        doorGroup.add(doorPanel);
+
+        const doorMat = new THREE.MeshStandardMaterial({
+            color: 0x7a5a3a,
+            roughness: 0.5,
+            metalness: 0.1,
+            side: THREE.DoubleSide,
+        });
+        const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.3, 0.08), doorMat);
+        doorMesh.position.set(0, 1.15, 0);
+        doorMesh.castShadow = true;
+        doorPanel.add(doorMesh);
+
+        const handleMat = new THREE.MeshStandardMaterial({
+            color: 0xd4a54a,
+            roughness: 0.3,
+            metalness: 0.7,
+        });
+        const handle = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), handleMat);
+        handle.position.set(0.55, 1.2, 0.1);
+        doorPanel.add(handle);
+
+        // Door trim
+        const trimMat = new THREE.MeshStandardMaterial({
+            color: 0x6a4a2a,
+            roughness: 0.7,
+            metalness: 0.0,
+        });
+        for (let side of [
+                [-0.85, 0],
+                [0.85, 0],
+                [0, 1.25]
+            ]) {
+            const isTop = side[1] > 0;
+            const trim = new THREE.Mesh(
+                new THREE.BoxGeometry(isTop ? 1.7 : 0.1, isTop ? 0.1 : 2.5, 0.1),
+                trimMat
+            );
+            trim.position.set(side[0], side[1], 0.08);
+            doorGroup.add(trim);
+        }
+
+        // Hinges
+        const hingeMat = new THREE.MeshStandardMaterial({
+            color: 0x8a7a5a,
+            roughness: 0.5,
+            metalness: 0.3,
+        });
+        for (let y of [0.4, 2.0]) {
+            const hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 8), hingeMat);
+            hinge.rotation.z = Math.PI / 2;
+            hinge.position.set(-0.75, y, 0.06);
+            doorGroup.add(hinge);
+        }
+
+        // ============================================================
+        //  WINDOWS
+        // ============================================================
+        function createWindow(x, y, z, rotY = 0) {
+            const winGroup = new THREE.Group();
+            winGroup.position.set(x, y, z);
+            winGroup.rotation.y = rotY;
+            houseGroup.add(winGroup);
+
+            const frameMatW = new THREE.MeshStandardMaterial({
+                color: 0x8a7a6a,
+                roughness: 0.5,
+                metalness: 0.1,
+            });
+            const glassMat = new THREE.MeshStandardMaterial({
+                color: 0x88bbdd,
+                roughness: 0.05,
+                metalness: 0.1,
+                transparent: true,
+                opacity: 0.3,
+            });
+            const ww = 0.7,
+                wh = 0.9,
+                wd = 0.06;
+            const f = new THREE.Mesh(new THREE.BoxGeometry(ww + 0.1, wh + 0.1, wd), frameMatW);
+            f.castShadow = true;
+            winGroup.add(f);
+            const g = new THREE.Mesh(new THREE.BoxGeometry(ww - 0.1, wh - 0.1, wd * 0.5), glassMat);
+            g.position.z = 0.03;
+            winGroup.add(g);
+            const crossMat = new THREE.MeshStandardMaterial({ color: 0x8a7a6a });
+            const hBar = new THREE.Mesh(new THREE.BoxGeometry(ww - 0.1, 0.03, wd * 0.6), crossMat);
+            hBar.position.z = 0.03;
+            winGroup.add(hBar);
+            const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, wh - 0.1, wd * 0.6), crossMat);
+            vBar.position.z = 0.03;
+            winGroup.add(vBar);
+            return winGroup;
+        }
+
+        createWindow(-houseWidth / 2 + 0.1, 1.6, -1.0, -Math.PI / 2);
+        createWindow(-houseWidth / 2 + 0.1, 1.6, 1.0, -Math.PI / 2);
+        createWindow(houseWidth / 2 - 0.1, 1.6, -1.0, Math.PI / 2);
+        createWindow(houseWidth / 2 - 0.1, 1.6, 1.0, Math.PI / 2);
+        createWindow(-1.2, 1.6, -houseDepth / 2 + 0.1, Math.PI);
+        createWindow(1.2, 1.6, -houseDepth / 2 + 0.1, Math.PI);
+
+        // ============================================================
+        //  TREES & BUSHES
+        // ============================================================
+        function createTree(x, z, scale = 1) {
+            const tree = new THREE.Group();
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5a3a2a, roughness: 0.9 });
+            const trunk = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.15 * scale, 0.25 * scale, 0.8 * scale, 8),
+                trunkMat
+            );
+            trunk.position.y = 0.4 * scale;
+            trunk.castShadow = true;
+            tree.add(trunk);
+
+            const leafMat = new THREE.MeshStandardMaterial({ color: 0x3a7a2a, roughness: 0.8 });
+            const leafMat2 = new THREE.MeshStandardMaterial({ color: 0x4a8a3a, roughness: 0.8 });
+            const crown1 = new THREE.Mesh(new THREE.SphereGeometry(0.6 * scale, 7, 7), leafMat);
+            crown1.position.set(0, 0.9 * scale + 0.2 * scale, 0);
+            crown1.scale.y = 0.8;
+            crown1.castShadow = true;
+            tree.add(crown1);
+            const crown2 = new THREE.Mesh(new THREE.SphereGeometry(0.5 * scale, 7, 7), leafMat2);
+            crown2.position.set(0.3 * scale, 1.1 * scale + 0.2 * scale, 0.2 * scale);
+            crown2.scale.y = 0.7;
+            crown2.castShadow = true;
+            tree.add(crown2);
+            const crown3 = new THREE.Mesh(new THREE.SphereGeometry(0.45 * scale, 7, 7), leafMat);
+            crown3.position.set(-0.25 * scale, 1.0 * scale + 0.2 * scale, -0.2 * scale);
+            crown3.scale.y = 0.7;
+            crown3.castShadow = true;
+            tree.add(crown3);
+            tree.position.set(x, 0, z);
+            return tree;
+        }
+
+        scene.add(createTree(-4.5, -3.5, 1.2));
+        scene.add(createTree(5.0, -3.0, 1.0));
+        scene.add(createTree(-3.8, 4.5, 0.9));
+        scene.add(createTree(4.2, 4.0, 1.1));
+        scene.add(createTree(-5.5, 1.0, 0.8));
+
+        function createBush(x, z, s = 0.5) {
+            const bushMat = new THREE.MeshStandardMaterial({ color: 0x3a7a2a, roughness: 0.9 });
+            const bush = new THREE.Mesh(new THREE.SphereGeometry(s, 6, 6), bushMat);
+            bush.position.set(x, s * 0.6, z);
+            bush.scale.y = 0.7;
+            bush.castShadow = true;
+            scene.add(bush);
+            const bush2 = new THREE.Mesh(new THREE.SphereGeometry(s * 0.7, 6, 6), bushMat);
+            bush2.position.set(x + s * 0.6, s * 0.4, z + s * 0.4);
+            bush2.scale.y = 0.7;
+            bush2.castShadow = true;
+            scene.add(bush2);
+        }
+        createBush(-3.2, 3.2, 0.4);
+        createBush(3.5, 3.5, 0.35);
+        createBush(-3.5, -3.8, 0.45);
+        createBush(3.8, -3.5, 0.4);
+
+        // ============================================================
+        //  INTERIOR
+        // ============================================================
+        const interiorGroup = new THREE.Group();
+        houseGroup.add(interiorGroup);
+
+        // Table
+        const tableMat = new THREE.MeshStandardMaterial({ color: 0x6a4a3a, roughness: 0.6, metalness: 0.05 });
+        const tableTop = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.08, 0.9), tableMat);
+        tableTop.position.set(0.8, 0.7, -1.0);
+        tableTop.castShadow = true;
+        tableTop.receiveShadow = true;
+        interiorGroup.add(tableTop);
+
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x5a3a2a, roughness: 0.7 });
+        for (let lx of [-0.55, 0.55]) {
+            for (let lz of [-0.35, 0.35]) {
+                const leg = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.04, 0.05, 0.62, 6),
+                    legMat
+                );
+                leg.position.set(0.8 + lx, 0.31, -1.0 + lz);
+                leg.castShadow = true;
+                interiorGroup.add(leg);
+            }
+        }
+
+        // Chairs
+        function createChair(x, z, rotY = 0) {
+            const chair = new THREE.Group();
+            const chairMat = new THREE.MeshStandardMaterial({ color: 0x7a5a4a, roughness: 0.6 });
+            const seat = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.5), chairMat);
+            seat.position.y = 0.45;
+            seat.castShadow = true;
+            seat.receiveShadow = true;
+            chair.add(seat);
+            const back = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.04), chairMat);
+            back.position.set(0, 0.7, -0.25);
+            back.castShadow = true;
+            chair.add(back);
+            for (let lx of [-0.2, 0.2]) {
+                for (let lz of [-0.2, 0.2]) {
+                    const leg = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.025, 0.03, 0.4, 6),
+                        new THREE.MeshStandardMaterial({ color: 0x5a3a2a })
+                    );
+                    leg.position.set(lx, 0.2, lz);
+                    leg.castShadow = true;
+                    chair.add(leg);
+                }
+            }
+            chair.position.set(x, 0, z);
+            chair.rotation.y = rotY;
+            interiorGroup.add(chair);
+            return chair;
+        }
+        createChair(0.0, -0.5, 0);
+        createChair(1.6, -0.5, 0);
+
+        // Side table
+        const sideMat = new THREE.MeshStandardMaterial({ color: 0x8a7a5a, roughness: 0.5 });
+        const sideTable = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.5), sideMat);
+        sideTable.position.set(-1.4, 0.45, 0.5);
+        sideTable.castShadow = true;
+        sideTable.receiveShadow = true;
+        interiorGroup.add(sideTable);
+        for (let lx of [-0.2, 0.2]) {
+            for (let lz of [-0.2, 0.2]) {
+                const leg = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.025, 0.03, 0.4, 6),
+                    new THREE.MeshStandardMaterial({ color: 0x5a3a2a })
+                );
+                leg.position.set(-1.4 + lx, 0.2, 0.5 + lz);
+                leg.castShadow = true;
+                interiorGroup.add(leg);
+            }
+        }
+
+        // Rug
+        const rugMat = new THREE.MeshStandardMaterial({
+            color: 0x8a2a2a,
+            roughness: 0.9,
+            transparent: true,
+            opacity: 0.5,
+        });
+        const rug = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.2), rugMat);
+        rug.rotation.x = -Math.PI / 2;
+        rug.position.set(0.6, 0.03, -0.6);
+        rug.receiveShadow = true;
+        interiorGroup.add(rug);
+
+        // Interior lights
+        function addInteriorLight(x, y, z, color = 0xffeedd, intensity = 0.8) {
+            const light = new THREE.PointLight(color, intensity, 6);
+            light.position.set(x, y, z);
+            interiorGroup.add(light);
+            const glowMat = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.2,
+                transparent: true,
+                opacity: 0.1,
+            });
+            const glow = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), glowMat);
+            glow.position.set(x, y, z);
+            interiorGroup.add(glow);
+            return light;
+        }
+        addInteriorLight(0, 2.6, -1, 0xffdd88, 1.0);
+        addInteriorLight(-1.8, 2.6, 1.5, 0xffcc77, 0.7);
+        addInteriorLight(1.8, 2.6, 1.5, 0xffcc77, 0.7);
+
+        // ============================================================
+        //  PICTURE FRAMES (decorative on side walls)
+        // ============================================================
+        const frames = []; // will store all frame data including final two
+
+        function createPictureFrame(x, y, z, rotY, imgUrl = null, scale = 1, isGolden = false) {
+            const group = new THREE.Group();
+            group.position.set(x, y, z);
+            group.rotation.y = rotY;
+            interiorGroup.add(group);
+
+            const fw = 0.8 * scale;
+            const fh = 0.6 * scale;
+            const fd = 0.05 * scale;
+
+            let frameMatP;
+            if (isGolden) {
+                frameMatP = new THREE.MeshStandardMaterial({
+                    color: 0xd4a54a,
+                    roughness: 0.2,
+                    metalness: 0.8,
+                    emissive: 0xd4a54a,
+                    emissiveIntensity: 0.05,
+                });
+            } else {
+                frameMatP = new THREE.MeshStandardMaterial({
+                    color: 0x8a7a5a,
+                    roughness: 0.4,
+                    metalness: 0.3,
+                });
+            }
+
+            const frameMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(fw, fh, fd),
+                frameMatP
+            );
+            frameMesh.castShadow = true;
+            frameMesh.receiveShadow = true;
+            group.add(frameMesh);
+
+            const innerMat = new THREE.MeshStandardMaterial({
+                color: isGolden ? 0xf5d78a : 0x9a8a7a,
+                roughness: 0.3,
+                metalness: isGolden ? 0.9 : 0.2,
+            });
+            const inner = new THREE.Mesh(
+                new THREE.BoxGeometry(fw - 0.1 * scale, fh - 0.1 * scale, fd * 0.5),
+                innerMat
+            );
+            inner.position.z = isGolden ? 0.035 * scale : 0.03 * scale;
+            group.add(inner);
+
+            // Image plane
+            const imgMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(fw - 0.12 * scale, fh - 0.12 * scale),
+                new THREE.MeshStandardMaterial({
+                    roughness: 0.3,
+                    metalness: 0.0,
+                    emissive: isGolden ? new THREE.Color(0xd4a54a) : new THREE.Color(0x000000),
+                    emissiveIntensity: isGolden ? 0.05 : 0,
+                    color: 0xffffff,
+                })
+            );
+            imgMesh.position.z = fd * 0.5 + 0.005;
+            group.add(imgMesh);
+
+            // Load image if URL provided
+            if (imgUrl) {
+                const loader = new THREE.TextureLoader();
+                loader.load(imgUrl, (tex) => {
+                    imgMesh.material.map = tex;
+                    imgMesh.material.needsUpdate = true;
+                }, undefined, (err) => {
+                    console.warn('Failed to load image:', imgUrl);
+                    // fallback: draw a placeholder
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 384;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#2a1a0a';
+                    ctx.fillRect(0, 0, 512, 384);
+                    ctx.fillStyle = '#e8d5b0';
+                    ctx.font = '24px Georgia';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('📷', 256, 180);
+                    ctx.font = '16px Georgia';
+                    ctx.fillText('Image not found', 256, 230);
+                    const fallbackTex = new THREE.CanvasTexture(canvas);
+                    imgMesh.material.map = fallbackTex;
+                    imgMesh.material.needsUpdate = true;
+                });
+            } else {
+                // Decorative frames with canvas art
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 384;
+                const ctx = canvas.getContext('2d');
+                const colors = ['#4a6a8a', '#6a4a6a', '#4a6a4a', '#8a6a4a', '#6a4a8a'];
+                const c = colors[Math.floor(Math.random() * colors.length)];
+                const c2 = colors[Math.floor(Math.random() * colors.length)];
+                const grad = ctx.createLinearGradient(0, 0, 512, 384);
+                grad.addColorStop(0, c);
+                grad.addColorStop(1, c2);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 384);
+                for (let i = 0; i < 20; i++) {
+                    const xp = Math.random() * 512;
+                    const yp = Math.random() * 384;
+                    const r = 10 + Math.random() * 60;
+                    ctx.fillStyle = `rgba(255,255,255,${0.03 + Math.random() * 0.08})`;
+                    ctx.beginPath();
+                    ctx.arc(xp, yp, r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.anisotropy = 4;
+                imgMesh.material.map = tex;
+                imgMesh.material.needsUpdate = true;
+            }
+
+            const frameData = {
+                group,
+                mesh: frameMesh,
+                imgMesh,
+                isGolden,
+                baseScale: scale,
+                x,
+                y,
+                z,
+                rotY,
+                glowIntensity: isGolden ? 0.3 : 0.05,
+                pulsePhase: Math.random() * Math.PI * 2,
+            };
+            frames.push(frameData);
+
+            // If golden, add glow sprite
+            if (isGolden) {
+                const spriteMap = (() => {
+                    const c = document.createElement('canvas');
+                    c.width = 128;
+                    c.height = 128;
+                    const cx = c.getContext('2d');
+                    const grad = cx.createRadialGradient(64, 64, 0, 64, 64, 64);
+                    grad.addColorStop(0, 'rgba(255,215,0,0.5)');
+                    grad.addColorStop(0.3, 'rgba(255,200,100,0.2)');
+                    grad.addColorStop(1, 'rgba(255,200,100,0)');
+                    cx.fillStyle = grad;
+                    cx.fillRect(0, 0, 128, 128);
+                    return new THREE.CanvasTexture(c);
+                })();
+                const spriteMat = new THREE.SpriteMaterial({
+                    map: spriteMap,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false,
+                });
+                const sprite = new THREE.Sprite(spriteMat);
+                sprite.scale.set(2.5 * scale, 2.5 * scale, 1);
+                sprite.position.z = 0.1 * scale;
+                group.add(sprite);
+                frameData.sprite = sprite;
+            }
+
+            return group;
+        }
+
+        // Decorative frames on side walls (no image URLs)
+        createPictureFrame(-1.2, 1.6, -houseDepth / 2 + 0.08, 0, null, 1.0, false);
+        createPictureFrame(1.2, 1.6, -houseDepth / 2 + 0.08, 0, null, 1.0, false);
+        createPictureFrame(-houseWidth / 2 + 0.08, 1.6, -1.2, -Math.PI / 2, null, 0.9, false);
+        createPictureFrame(-houseWidth / 2 + 0.08, 1.0, 0.6, -Math.PI / 2, null, 0.9, false);
+        createPictureFrame(houseWidth / 2 - 0.08, 1.6, -1.2, Math.PI / 2, null, 0.9, false);
+        createPictureFrame(houseWidth / 2 - 0.08, 1.0, 0.6, Math.PI / 2, null, 0.9, false);
+
+        // ============================================================
+        //  TWO FINAL IMAGES ON THE BACK WALL (photo1.jpg and photo2.jpg)
+        // ============================================================
+        // They will be golden frames with glow and effects
+        const backZ = -houseDepth / 2 + 0.15;
+        const yPos = 1.6;
+        const scale = 1.4;
+        const spacing = 1.4;
+
+        // Frame 1: photo1.jpg (left)
+        const frame1 = createPictureFrame(-spacing / 2, yPos, backZ, 0, 'photo1.jpg', scale, true);
+        // Frame 2: photo2.jpg (right)
+        const frame2 = createPictureFrame(spacing / 2, yPos, backZ, 0, 'photo2.jpg', scale, true);
+
+        // Store references to the two final frames for proximity detection
+        const finalFrames = [frames[frames.length - 2], frames[frames.length - 1]];
+
+        // ============================================================
+        //  PARTICLE SYSTEMS (effects for the final images)
+        // ============================================================
+        const particleSystems = [];
+
+        function createParticleSystem(count, color, size, spread, yRange, shape = 'sphere', speed = 0.5) {
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const velocities = [];
+            const basePositions = [];
+
+            for (let i = 0; i < count; i++) {
+                let x, y, z;
+                if (shape === 'sphere') {
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos(2 * Math.random() - 1);
+                    const r = Math.random() * spread;
+                    x = r * Math.sin(phi) * Math.cos(theta);
+                    y = r * Math.cos(phi) + yRange[0] + (yRange[1] - yRange[0]) * 0.5;
+                    z = r * Math.sin(phi) * Math.sin(theta);
+                } else if (shape === 'heart') {
+                    const t = Math.random() * Math.PI * 2;
+                    const r = spread * 0.3 * (1 + Math.random() * 0.5);
+                    const hx = 16 * Math.pow(Math.sin(t), 3);
+                    const hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+                    x = hx * r * 0.03;
+                    y = hy * r * 0.03 + yRange[0] + (yRange[1] - yRange[0]) * 0.5;
+                    z = (Math.random() - 0.5) * spread * 0.4;
+                } else {
+                    x = (Math.random() - 0.5) * spread;
+                    y = yRange[0] + Math.random() * (yRange[1] - yRange[0]);
+                    z = (Math.random() - 0.5) * spread;
+                }
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
+                basePositions.push({ x, y, z });
+                velocities.push({
+                    x: (Math.random() - 0.5) * speed * 0.3,
+                    y: 0.2 + Math.random() * speed * 0.5,
+                    z: (Math.random() - 0.5) * speed * 0.3,
+                });
+            }
+
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const mat = new THREE.PointsMaterial({
+                color: color,
+                size: size,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                sizeAttenuation: true,
+            });
+
+            const points = new THREE.Points(geo, mat);
+            points.position.set(0, 0, -houseDepth / 2 + 0.5);
+
+            const system = {
+                points,
+                velocities,
+                basePositions,
+                count,
+                spread,
+                yRange,
+                speed,
+                life: 0,
+                active: false,
+            };
+            particleSystems.push(system);
+            return system;
+        }
+
+        const heartParticles = createParticleSystem(60, 0xff4466, 0.12, 2.5, [0.5, 3.5], 'heart', 0.5);
+        const sparkleParticles = createParticleSystem(120, 0xffdd44, 0.05, 3.0, [0.5, 4.0], 'sphere', 0.4);
+        const goldenParticles = createParticleSystem(80, 0xd4a54a, 0.08, 2.8, [0.5, 3.8], 'sphere', 0.5);
+        const confettiParticles = createParticleSystem(100, 0xff6688, 0.1, 3.2, [0.5, 4.2], 'sphere', 0.6);
+
+        particleSystems.forEach(sys => {
+            sys.points.visible = false;
+            interiorGroup.add(sys.points);
+        });
+
+        // Ambient floating hearts
+        const ambientHearts = [];
+        for (let i = 0; i < 12; i++) {
+            const h = createParticleSystem(1, 0xff4466, 0.14, 0.5, [0.5, 3.5], 'heart', 0.25);
+            h.points.position.set(
+                (Math.random() - 0.5) * 4,
+                0.5 + Math.random() * 2.5,
+                (Math.random() - 0.5) * 4 - 1
+            );
+            h.points.visible = true;
+            h.active = true;
+            h.life = Math.random() * 100;
+            h.speed = 0.15 + Math.random() * 0.25;
+            ambientHearts.push(h);
+            interiorGroup.add(h.points);
+        }
+
+        // ============================================================
+        //  FIRST-PERSON CONTROLS (custom)
+        // ============================================================
+        let fpControls = {
+            enabled: false,
+            yaw: 0,
+            pitch: 0,
+            speed: 2.8,
+            isLocked: false,
+        };
+
+        let isPointerLocked = false;
+
+        document.addEventListener('mousemove', (e) => {
+            if (!fpControls.enabled) return;
+            if (document.pointerLockElement === renderer.domElement) {
+                fpControls.yaw -= e.movementX * 0.002;
+                fpControls.pitch -= e.movementY * 0.002;
+                fpControls.pitch = Math.max(-1.2, Math.min(1.2, fpControls.pitch));
+            }
+        });
+
+        document.addEventListener('click', () => {
+            if (fpControls.enabled && !isPointerLocked && !isTransitioning) {
+                renderer.domElement.requestPointerLock?.();
+            }
+        });
+
+        document.addEventListener('pointerlockchange', () => {
+            isPointerLocked = document.pointerLockElement === renderer.domElement;
+            fpControls.isLocked = isPointerLocked;
+        });
+
+        // Keyboard
+        const keys = { w: false, a: false, s: false, d: false };
+        document.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            if (k in keys) keys[k] = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            const k = e.key.toLowerCase();
+            if (k in keys) keys[k] = false;
+        });
+
+        // Mobile joystick
+        let joystickActive = false;
+        let joystickDX = 0,
+            joystickDY = 0;
+
+        if (joystickArea) {
+            const handleTouch = (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                if (!touch) { joystickActive = false;
+                    joystickDX = 0;
+                    joystickDY = 0; return; }
+                const rect = joystickArea.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = touch.clientX - cx;
+                const dy = touch.clientY - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const maxDist = rect.width / 2 - 10;
+                const clamped = Math.min(dist, maxDist);
+                const angle = Math.atan2(dy, dx);
+                const normX = Math.cos(angle) * (clamped / maxDist);
+                const normY = Math.sin(angle) * (clamped / maxDist);
+                joystickDX = normX;
+                joystickDY = normY;
+                joystickActive = true;
+                joystickKnob.style.transform = `translate(${normX * maxDist}px, ${normY * maxDist}px)`;
+            };
+
+            const resetJoystick = () => {
+                joystickActive = false;
+                joystickDX = 0;
+                joystickDY = 0;
+                joystickKnob.style.transform = 'translate(0,0)';
+            };
+
+            joystickArea.addEventListener('touchstart', handleTouch, { passive: false });
+            joystickArea.addEventListener('touchmove', handleTouch, { passive: false });
+            joystickArea.addEventListener('touchend', resetJoystick, { passive: false });
+            joystickArea.addEventListener('touchcancel', resetJoystick, { passive: false });
+        }
+
+        // ============================================================
+        //  DOOR INTERACTION
+        // ============================================================
+        let doorOpen = false;
+
+        function openDoor() {
+            if (doorOpen || isTransitioning) return;
+            doorOpen = true;
+            isTransitioning = true;
+
+            gsap.to(doorPanel.rotation, {
+                y: -Math.PI / 1.8,
+                duration: 1.8,
+                ease: 'power3.inOut',
+            });
+
+            gsap.to(handle.position, {
+                x: 0.45,
+                z: 0.2,
+                duration: 1.2,
+                ease: 'power2.out',
+            });
+
+            enterBtn.classList.remove('visible');
+
+            const startPos = camera.position.clone();
+            const startTarget = orbitControls.target.clone();
+            const endPos = new THREE.Vector3(0.2, 1.2, houseDepth / 2 - 0.8);
+            const endTarget = new THREE.Vector3(0, 1.2, -1);
+
+            gsap.to(camera.position, {
+                x: endPos.x,
+                y: endPos.y,
+                z: endPos.z,
+                duration: 2.2,
+                ease: 'power2.inOut',
+                onUpdate: () => {
+                    const t = gsap.utils.interpolate(0, 1, gsap.utils.clamp(0, 1, (camera.position.x - startPos.x) / (
+                        endPos.x - startPos.x + 0.001)));
+                    orbitControls.target.lerpVectors(startTarget, endTarget, t);
+                    orbitControls.update();
+                },
+                onComplete: () => {
+                    isInside = true;
+                    orbitControls.enabled = false;
+                    orbitControls.autoRotate = false;
+
+                    fpControls.enabled = true;
+                    fpControls.yaw = 0;
+                    fpControls.pitch = -0.05;
+                    renderer.domElement.requestPointerLock?.();
+                    updateFPCamera();
+                    isTransitioning = false;
+                    hudHint.classList.add('visible');
+
+                    // Effects will be triggered by proximity
+                }
+            });
+
+            gsap.to(orbitControls.target, {
+                x: endTarget.x,
+                y: endTarget.y,
+                z: endTarget.z,
+                duration: 2.2,
+                ease: 'power2.inOut',
+            });
+        }
+
+        enterBtn.addEventListener('click', openDoor);
+        enterBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            openDoor();
+        });
+
+        // ============================================================
+        //  FINAL EFFECTS (triggered when near either final frame)
+        // ============================================================
+        let effectsTriggered = false;
+
+        function triggerFinalEffects() {
+            if (effectsTriggered) return;
+            effectsTriggered = true;
+
+            // Animate both final frames
+            finalFrames.forEach((gd, idx) => {
+                if (!gd) return;
+                const delay = idx * 0.2;
+                gsap.to(gd.group.position, {
+                    z: gd.group.position.z + 0.2,
+                    duration: 1.5,
+                    delay: delay,
+                    ease: 'back.out(1.2)',
+                });
+                gsap.to(gd.group.scale, {
+                    x: 1.08,
+                    y: 1.08,
+                    z: 1.08,
+                    duration: 1.5,
+                    delay: delay,
+                    ease: 'back.out(1.2)',
+                });
+                gsap.to(gd.mesh.material, {
+                    emissiveIntensity: 0.35,
+                    duration: 0.8,
+                    delay: delay,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'sine.inOut',
+                });
+            });
+
+            // Activate particles
+            particleSystems.forEach((sys, idx) => {
+                setTimeout(() => {
+                    sys.points.visible = true;
+                    sys.active = true;
+                    sys.life = 0;
+                    const pos = sys.points.geometry.attributes.position;
+                    for (let i = 0; i < sys.count; i++) {
+                        const base = sys.basePositions[i];
+                        pos.array[i * 3] = base.x + (Math.random() - 0.5) * 0.5;
+                        pos.array[i * 3 + 1] = base.y + (Math.random() - 0.5) * 0.5;
+                        pos.array[i * 3 + 2] = base.z + (Math.random() - 0.5) * 0.5;
+                    }
+                    pos.needsUpdate = true;
+                }, idx * 200);
+            });
+
+            // Confetti burst
+            const confettiSys = particleSystems[3];
+            if (confettiSys) {
+                const pos = confettiSys.points.geometry.attributes.position;
+                for (let i = 0; i < confettiSys.count; i++) {
+                    pos.array[i * 3] = (Math.random() - 0.5) * 4;
+                    pos.array[i * 3 + 1] = 0.5 + Math.random() * 3.5;
+                    pos.array[i * 3 + 2] = (Math.random() - 0.5) * 4 - 0.5;
+                }
+                pos.needsUpdate = true;
+                confettiSys.points.visible = true;
+                confettiSys.active = true;
+            }
+
+            // Slight camera sway
+            gsap.to(camera.position, {
+                x: camera.position.x + 0.2,
+                duration: 2.0,
+                ease: 'sine.inOut',
+                yoyo: true,
+                repeat: 1,
+            });
+        }
+
+        // ============================================================
+        //  UPDATE FUNCTIONS
+        // ============================================================
+        function updateFPCamera() {
+            const euler = new THREE.Euler(fpControls.pitch, fpControls.yaw, 0, 'YXZ');
+            camera.quaternion.setFromEuler(euler);
+        }
+
+        function updateFPControls(delta) {
+            if (!fpControls.enabled || isTransitioning) return;
+
+            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(
+                new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
+            );
+            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(
+                new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
+            );
+
+            let moveX = 0,
+                moveZ = 0;
+            if (keys.w) { moveX += forward.x;
+                moveZ += forward.z; }
+            if (keys.s) { moveX -= forward.x;
+                moveZ -= forward.z; }
+            if (keys.a) { moveX -= right.x;
+                moveZ -= right.z; }
+            if (keys.d) { moveX += right.x;
+                moveZ += right.z; }
+
+            if (joystickActive) {
+                const jf = new THREE.Vector3(0, 0, -joystickDY).applyQuaternion(
+                    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
+                );
+                const jr = new THREE.Vector3(joystickDX, 0, 0).applyQuaternion(
+                    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
+                );
+                moveX += jf.x + jr.x;
+                moveZ += jf.z + jr.z;
+            }
+
+            const len = Math.sqrt(moveX * moveX + moveZ * moveZ);
+            if (len > 0) {
+                moveX /= len;
+                moveZ /= len;
+            }
+
+            const speed = fpControls.speed * delta;
+            const newPos = camera.position.clone();
+            newPos.x += moveX * speed;
+            newPos.z += moveZ * speed;
+
+            const margin = 0.3;
+            const halfW = houseWidth / 2 - margin;
+            const halfD = houseDepth / 2 - margin;
+            newPos.x = Math.max(-halfW, Math.min(halfW, newPos.x));
+            newPos.z = Math.max(-halfD, Math.min(halfD, newPos.z));
+
+            camera.position.copy(newPos);
+            camera.position.y = 1.2;
+
+            updateFPCamera();
+
+            // Update each final frame scale based on distance
+            finalFrames.forEach((gd) => {
+                if (!gd) return;
+                const dist = camera.position.distanceTo(
+                    new THREE.Vector3(gd.x, gd.y, gd.z)
+                );
+                const scaleFactor = Math.max(1, 3.5 - dist * 0.3);
+                const s = Math.min(2.0, Math.max(1.0, scaleFactor));
+                const current = gd.group.scale.x;
+                const target = s * 0.9;
+                const newS = current + (target - current) * 0.06;
+                gd.group.scale.set(newS, newS, newS);
+            });
+
+            // Check proximity to any final frame
+            if (!effectsTriggered) {
+                let near = false;
+                for (const gd of finalFrames) {
+                    if (!gd) continue;
+                    const dist = camera.position.distanceTo(
+                        new THREE.Vector3(gd.x, gd.y, gd.z)
+                    );
+                    if (dist < 2.8) {
+                        near = true;
+                        break;
+                    }
+                }
+                if (near) {
+                    triggerFinalEffects();
+                }
+            }
+        }
+
+        // ============================================================
+        //  ANIMATION LOOP
+        // ============================================================
+        const clock = new THREE.Clock();
+
+        function animate() {
+            const delta = Math.min(clock.getDelta(), 0.05);
+            const elapsed = clock.elapsedTime;
+
+            if (!isInside && orbitControls.enabled) {
+                orbitControls.update();
+            }
+
+            if (fpControls.enabled) {
+                updateFPControls(delta);
+            }
+
+            // Animate all frames (including final ones)
+            frames.forEach((f) => {
+                const pulse = Math.sin(elapsed * 0.8 + f.pulsePhase) * 0.5 + 0.5;
+                if (f.isGolden) {
+                    const intensity = 0.05 + pulse * 0.25;
+                    f.mesh.material.emissiveIntensity = intensity;
+                    if (f.sprite) {
+                        const s = 2.0 + pulse * 0.8;
+                        f.sprite.scale.set(s, s, 1);
+                        f.sprite.material.opacity = 0.3 + pulse * 0.4;
+                    }
+                } else {
+                    const dist = camera.position.distanceTo(
+                        new THREE.Vector3(f.x, f.y, f.z)
+                    );
+                    const glow = Math.max(0, 1 - dist / 6) * 0.15;
+                    f.mesh.material.emissiveIntensity = glow + 0.02;
+                }
+            });
+
+            // Update particles
+            particleSystems.forEach(sys => {
+                if (!sys.active || !sys.points.visible) return;
+                sys.life += delta;
+                const pos = sys.points.geometry.attributes.position;
+                const arr = pos.array;
+                for (let i = 0; i < sys.count; i++) {
+                    const idx = i * 3;
+                    const base = sys.basePositions[i];
+                    arr[idx + 1] += sys.velocities[i].y * delta * 0.5;
+                    arr[idx] += Math.sin(elapsed + i) * delta * 0.1;
+                    arr[idx + 2] += Math.cos(elapsed * 0.7 + i * 0.5) * delta * 0.1;
+                    if (arr[idx + 1] > sys.yRange[1] + 0.5) {
+                        arr[idx + 1] = sys.yRange[0] + Math.random() * 0.5;
+                        arr[idx] = base.x + (Math.random() - 0.5) * 0.5;
+                        arr[idx + 2] = base.z + (Math.random() - 0.5) * 0.5;
+                    }
+                }
+                pos.needsUpdate = true;
+                const lifeNorm = Math.min(1, sys.life / 1.5);
+                sys.points.material.opacity = Math.min(1, lifeNorm * 0.9);
+            });
+
+            // Ambient hearts
+            ambientHearts.forEach((h, idx) => {
+                if (!h.active) return;
+                h.life += delta;
+                const pos = h.points.geometry.attributes.position;
+                const arr = pos.array;
+                arr[1] += Math.sin(elapsed * h.speed + idx) * delta * 0.15;
+                arr[0] += Math.sin(elapsed * 0.5 + idx * 1.3) * delta * 0.06;
+                arr[2] += Math.cos(elapsed * 0.4 + idx * 0.9) * delta * 0.06;
+                if (arr[1] > 3.5) arr[1] = 0.5;
+                if (arr[1] < 0.3) arr[1] = 3.5;
+                if (arr[0] > 2.2) arr[0] = -2.2;
+                if (arr[0] < -2.2) arr[0] = 2.2;
+                if (arr[2] > 1.5) arr[2] = -3.5;
+                if (arr[2] < -3.5) arr[2] = 1.5;
+                pos.needsUpdate = true;
+                h.points.material.opacity = 0.3 + Math.sin(elapsed * 0.6 + idx) * 0.2;
+            });
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // ============================================================
+        //  RESIZE
+        // ============================================================
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        console.log('🏠 3D House with Two Final Images');
+        console.log('📸 Place photo1.jpg and photo2.jpg in the same folder as index.html');
+        console.log('🖱 Drag to look, WASD to move, or use joystick on mobile');
+        console.log('✨ Approach the two golden frames to trigger effects!');
+
+        // ============================================================
+        //  IMAGE REPLACEMENT GUIDE
+        // ============================================================
+        /*
+         *  TO REPLACE THE FINAL IMAGES:
+         *  1. Place your images in the same folder as index.html
+         *  2. Name them 'photo1.jpg' and 'photo2.jpg' (or update the filenames
+         *     in the createPictureFrame calls for the final frames)
+         *  3. The frames will display your images with a beautiful glow
+         *
+         *  Supported formats: jpg, png, webp
+         */
+        console.log('📸 Final images: photo1.jpg (left) and photo2.jpg (right)');
+    </script>
+</body>
+</html>
