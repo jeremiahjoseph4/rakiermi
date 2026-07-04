@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>🎉 Happy Birthday! - 3D Surprise House</title>
+    <title>3D House - Sifen </title>
 
     <!-- ===== STYLES ===== -->
     <style>
@@ -13,7 +13,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             overflow: hidden;
             background: #0a0a0f;
@@ -21,8 +20,8 @@
             color: #fff;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            touch-action: none;
         }
-
         #canvas-container {
             width: 100vw;
             height: 100vh;
@@ -50,15 +49,15 @@
             pointer-events: none;
         }
         #loader h1 {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 300;
             letter-spacing: 6px;
-            color: #f5d78a;
+            color: #e8d5b0;
             margin-bottom: 20px;
-            text-shadow: 0 0 30px rgba(245, 215, 138, 0.3);
+            text-shadow: 0 0 30px rgba(232, 213, 176, 0.2);
         }
         .loader-bar-track {
-            width: 220px;
+            width: 180px;
             height: 2px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
@@ -67,73 +66,68 @@
         .loader-bar-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #f5d78a, #d4a54a);
+            background: linear-gradient(90deg, #e8d5b0, #b8945a);
             border-radius: 2px;
             transition: width 0.3s ease;
         }
         .loader-percent {
             margin-top: 12px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.3);
         }
 
-        /* ----- ENTER Button (overlay) ----- */
+        /* ----- ENTER Button ----- */
         #enter-btn {
             position: fixed;
             bottom: 14%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
-            padding: 16px 52px;
-            font-size: 1.3rem;
+            padding: 16px 44px;
+            font-size: 1.2rem;
             font-family: 'Georgia', serif;
-            letter-spacing: 6px;
+            letter-spacing: 5px;
             text-transform: uppercase;
-            color: #f5d78a;
+            color: #e8d5b0;
             background: rgba(20, 18, 30, 0.75);
-            border: 1.5px solid rgba(245, 215, 138, 0.5);
+            border: 1.5px solid rgba(232, 213, 176, 0.4);
             border-radius: 50px;
             cursor: pointer;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
             transition: all 0.4s ease;
             opacity: 0;
             pointer-events: none;
-            animation: none;
+            touch-action: manipulation;
         }
         #enter-btn.visible {
             opacity: 1;
             pointer-events: auto;
-            animation: pulse-glow 2.2s ease-in-out infinite;
-        }
-        #enter-btn:hover {
-            background: rgba(245, 215, 138, 0.15);
-            border-color: #f5d78a;
-            box-shadow: 0 8px 50px rgba(245, 215, 138, 0.15), inset 0 0 30px rgba(245, 215, 138, 0.05);
-            transform: translateX(-50%) scale(1.02);
+            animation: pulse-glow 2.4s ease-in-out infinite;
         }
         #enter-btn:active {
-            transform: translateX(-50%) scale(0.96);
+            transform: translateX(-50%) scale(0.94);
         }
         @keyframes pulse-glow {
             0%,
             100% {
-                box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 215, 138, 0.05);
+                box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(232, 213, 176, 0.05);
             }
             50% {
-                box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(245, 215, 138, 0.15);
+                box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(232, 213, 176, 0.12);
             }
         }
 
-        /* ----- HUD Controls Hint ----- */
+        /* ----- HUD Hint ----- */
         #hud-hint {
             position: fixed;
-            bottom: 28px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             letter-spacing: 2px;
             color: rgba(255, 255, 255, 0.2);
             text-align: center;
@@ -146,35 +140,35 @@
         }
         #hud-hint span {
             display: inline-block;
-            margin: 0 8px;
+            margin: 0 6px;
         }
 
-        /* ----- Mobile Joystick (touch) ----- */
+        /* ----- Mobile Joystick ----- */
         #joystick-area {
             position: fixed;
-            bottom: 80px;
-            left: 40px;
+            bottom: 70px;
+            left: 30px;
             z-index: 8;
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             touch-action: none;
             display: none;
-            /* shown on mobile via media query */;
         }
         #joystick-knob {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 44px;
-            height: 44px;
-            margin: -22px 0 0 -22px;
+            width: 38px;
+            height: 38px;
+            margin: -19px 0 0 -19px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(245, 215, 138, 0.3), rgba(245, 215, 138, 0.05));
-            border: 1px solid rgba(245, 215, 138, 0.2);
+            background: radial-gradient(circle, rgba(232, 213, 176, 0.25), rgba(232, 213, 176, 0.04));
+            border: 1px solid rgba(232, 213, 176, 0.15);
             pointer-events: none;
             transition: transform 0.05s linear;
         }
@@ -189,26 +183,26 @@
             }
             #joystick-area {
                 display: block;
-                width: 90px;
-                height: 90px;
-                bottom: 60px;
-                left: 24px;
+                width: 80px;
+                height: 80px;
+                bottom: 50px;
+                left: 20px;
             }
             #joystick-knob {
-                width: 34px;
-                height: 34px;
-                margin: -17px 0 0 -17px;
+                width: 30px;
+                height: 30px;
+                margin: -15px 0 0 -15px;
             }
             #hud-hint {
-                bottom: 18px;
-                font-size: 0.55rem;
+                bottom: 14px;
+                font-size: 0.5rem;
             }
             #loader h1 {
-                font-size: 1.4rem;
+                font-size: 1.2rem;
                 letter-spacing: 4px;
             }
             .loader-bar-track {
-                width: 160px;
+                width: 140px;
             }
         }
         @media (max-width: 480px) {
@@ -216,17 +210,18 @@
                 padding: 12px 24px;
                 font-size: 0.85rem;
                 bottom: 10%;
+                letter-spacing: 3px;
             }
             #joystick-area {
-                width: 70px;
-                height: 70px;
-                bottom: 50px;
-                left: 16px;
+                width: 64px;
+                height: 64px;
+                bottom: 40px;
+                left: 14px;
             }
             #joystick-knob {
-                width: 28px;
-                height: 28px;
-                margin: -14px 0 0 -14px;
+                width: 24px;
+                height: 24px;
+                margin: -12px 0 0 -12px;
             }
         }
         @media (pointer: coarse) {
@@ -240,7 +235,6 @@
             }
         }
 
-        /* ----- Scrollbar Hide ----- */
         ::-webkit-scrollbar {
             display: none;
         }
@@ -265,9 +259,9 @@
 
     <!-- ===== HUD HINT ===== -->
     <div id="hud-hint">
-        <span>⌨ W A S D</span>
+        <span>⌨ WASD</span>
         <span>·</span>
-        <span>🖱 Drag to look</span>
+        <span>🖱 Drag</span>
     </div>
 
     <!-- ===== JOYSTICK (mobile) ===== -->
@@ -293,7 +287,6 @@
         // ============================================================
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
         import gsap from 'gsap';
 
         // ============================================================
@@ -309,7 +302,7 @@
         const joystickKnob = document.getElementById('joystick-knob');
 
         // ============================================================
-        //  LOADING TRACKING
+        //  LOADING
         // ============================================================
         let loadProgress = 0;
 
@@ -326,7 +319,6 @@
             }
         }
 
-        // Simulate loading (assets are procedural, so we just fake it)
         let loadTick = 0;
         const loadInterval = setInterval(() => {
             loadTick += 2 + Math.random() * 4;
@@ -351,7 +343,7 @@
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
             alpha: false,
-            powerPreference: "high-performance"
+            powerPreference: "high-performance",
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -366,11 +358,9 @@
         //  CONTROLS
         // ============================================================
         let orbitControls = null;
-        let pointerControls = null;
         let isInside = false;
         let isTransitioning = false;
 
-        // Orbit controls (outside)
         orbitControls = new OrbitControls(camera, renderer.domElement);
         orbitControls.target.set(0, 1.2, 0);
         orbitControls.enableDamping = true;
@@ -380,12 +370,8 @@
         orbitControls.maxPolarAngle = Math.PI / 2.1;
         orbitControls.minPolarAngle = 0.1;
         orbitControls.autoRotate = true;
-        orbitControls.autoRotateSpeed = 0.6;
+        orbitControls.autoRotateSpeed = 0.5;
         orbitControls.update();
-
-        // Pointer lock controls (inside) - created later when needed
-        // We'll use a custom first-person approach instead of PointerLockControls
-        // for better mobile support and smoother transitions.
 
         // ============================================================
         //  LIGHTING
@@ -414,11 +400,8 @@
         fillLight.position.set(-8, 4, -6);
         scene.add(fillLight);
 
-        // Warm interior lights (placed inside later)
-        const interiorLights = [];
-
         // ============================================================
-        //  TEXTURE HELPERS (canvas-generated)
+        //  TEXTURE HELPERS
         // ============================================================
         function createCanvasTexture(width, height, drawFn) {
             const canvas = document.createElement('canvas');
@@ -432,9 +415,8 @@
             return tex;
         }
 
-        // Wood floor texture
+        // Wood floor
         const floorTex = createCanvasTexture(512, 512, (ctx, w, h) => {
-            // Base wood color
             ctx.fillStyle = '#8b6b4a';
             ctx.fillRect(0, 0, w, h);
             for (let i = 0; i < 60; i++) {
@@ -453,7 +435,6 @@
                 ctx.stroke();
                 ctx.restore();
             }
-            // Subtle grain
             for (let i = 0; i < 200; i++) {
                 const x = Math.random() * w;
                 const y = Math.random() * h;
@@ -462,12 +443,10 @@
             }
         });
 
-        // Wall texture
+        // Wall
         const wallTex = createCanvasTexture(256, 256, (ctx, w, h) => {
-            const base = '#d4c8b0';
-            ctx.fillStyle = base;
+            ctx.fillStyle = '#d4c8b0';
             ctx.fillRect(0, 0, w, h);
-            // Subtle stucco
             for (let i = 0; i < 800; i++) {
                 const x = Math.random() * w;
                 const y = Math.random() * h;
@@ -480,7 +459,7 @@
             }
         });
 
-        // Roof texture
+        // Roof
         const roofTex = createCanvasTexture(256, 256, (ctx, w, h) => {
             ctx.fillStyle = '#5a3a2a';
             ctx.fillRect(0, 0, w, h);
@@ -492,7 +471,7 @@
             }
         });
 
-        // Grass texture
+        // Grass
         const grassTex = createCanvasTexture(512, 512, (ctx, w, h) => {
             const colors = ['#4a8a3a', '#3d7a30', '#5a9a4a', '#2d6a20'];
             ctx.fillStyle = '#4a8a3a';
@@ -513,7 +492,7 @@
         const houseGroup = new THREE.Group();
         scene.add(houseGroup);
 
-        // ---- Ground ----
+        // Ground
         const groundGeo = new THREE.PlaneGeometry(40, 40);
         const groundMat = new THREE.MeshStandardMaterial({
             map: grassTex,
@@ -526,35 +505,19 @@
         ground.receiveShadow = true;
         scene.add(ground);
 
-        // ---- House Base ----
+        // House dimensions
         const houseWidth = 5.2;
         const houseDepth = 6.0;
         const houseHeight = 2.8;
-        const wallMat = new THREE.MeshStandardMaterial({
+        const wallMatBoth = new THREE.MeshStandardMaterial({
             map: wallTex,
             roughness: 0.7,
             metalness: 0.0,
             color: 0xe8dcc8,
-        });
-        const wallMatInside = new THREE.MeshStandardMaterial({
-            map: wallTex,
-            roughness: 0.6,
-            metalness: 0.0,
-            color: 0xf0e8d8,
-            side: THREE.BackSide,
+            side: THREE.DoubleSide,
         });
 
-        // Exterior walls (visible from outside)
-        const wallMatExt = new THREE.MeshStandardMaterial({
-            map: wallTex,
-            roughness: 0.8,
-            metalness: 0.0,
-            color: 0xe0d4c0,
-        });
-
-        // We'll build the house as a room with walls, floor, ceiling
-
-        // Floor (inside)
+        // Floor
         const floorMat = new THREE.MeshStandardMaterial({
             map: floorTex,
             roughness: 0.6,
@@ -567,15 +530,8 @@
         floor.receiveShadow = true;
         houseGroup.add(floor);
 
-        // Walls (as boxes with thickness)
+        // Walls
         const wallThick = 0.15;
-        const wallMatBoth = new THREE.MeshStandardMaterial({
-            map: wallTex,
-            roughness: 0.7,
-            metalness: 0.0,
-            color: 0xe8dcc8,
-            side: THREE.DoubleSide,
-        });
 
         // Back wall
         const backWall = new THREE.Mesh(
@@ -607,8 +563,7 @@
         rightWall.receiveShadow = true;
         houseGroup.add(rightWall);
 
-        // Front wall (with door opening - we'll use two pieces)
-        // Left front wall piece
+        // Front wall pieces (with door opening)
         const frontLeft = new THREE.Mesh(
             new THREE.BoxGeometry(houseWidth / 2 - 0.5, houseHeight, wallThick),
             wallMatBoth
@@ -618,1260 +573,9 @@
         frontLeft.receiveShadow = true;
         houseGroup.add(frontLeft);
 
-        // Right front wall piece
         const frontRight = new THREE.Mesh(
             new THREE.BoxGeometry(houseWidth / 2 - 0.5, houseHeight, wallThick),
             wallMatBoth
         );
         frontRight.position.set(houseWidth / 4 + 0.25, houseHeight / 2, houseDepth / 2);
-        frontRight.castShadow = true;
-        frontRight.receiveShadow = true;
-        houseGroup.add(frontRight);
-
-        // Top front piece (above door)
-        const frontTop = new THREE.Mesh(
-            new THREE.BoxGeometry(1.6, 0.5, wallThick),
-            wallMatBoth
-        );
-        frontTop.position.set(0, houseHeight - 0.25, houseDepth / 2);
-        frontTop.castShadow = true;
-        frontTop.receiveShadow = true;
-        houseGroup.add(frontTop);
-
-        // Ceiling (invisible from outside but casts shadow)
-        const ceilMat = new THREE.MeshStandardMaterial({
-            color: 0xf5efe8,
-            roughness: 0.9,
-            metalness: 0.0,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.6,
-        });
-        const ceiling = new THREE.Mesh(
-            new THREE.PlaneGeometry(houseWidth - 0.4, houseDepth - 0.4),
-            ceilMat
-        );
-        ceiling.rotation.x = Math.PI / 2;
-        ceiling.position.set(0, houseHeight - 0.05, 0);
-        houseGroup.add(ceiling);
-
-        // ---- Roof ----
-        const roofShape = new THREE.Shape();
-        const rw = houseWidth / 2 + 0.6;
-        const rd = houseDepth / 2 + 0.6;
-        const rh = 1.8;
-        roofShape.moveTo(-rw, 0);
-        roofShape.lineTo(0, rh);
-        roofShape.lineTo(rw, 0);
-        roofShape.lineTo(-rw, 0);
-
-        const extrudeSettings = {
-            steps: 1,
-            depth: houseDepth + 1.2,
-            bevelEnabled: true,
-            bevelThickness: 0.1,
-            bevelSize: 0.05,
-            bevelSegments: 4,
-        };
-        const roofGeo = new THREE.ExtrudeGeometry(roofShape, extrudeSettings);
-        const roofMat = new THREE.MeshStandardMaterial({
-            map: roofTex,
-            roughness: 0.9,
-            metalness: 0.0,
-            color: 0x6a4a3a,
-        });
-        const roof = new THREE.Mesh(roofGeo, roofMat);
-        roof.position.set(0, houseHeight, -houseDepth / 2 - 0.6);
-        roof.castShadow = true;
-        roof.receiveShadow = true;
-        houseGroup.add(roof);
-
-        // ---- Door ----
-        const doorGroup = new THREE.Group();
-        doorGroup.position.set(0, 0, houseDepth / 2 - 0.05);
-        houseGroup.add(doorGroup);
-
-        // Door frame
-        const frameMat = new THREE.MeshStandardMaterial({
-            color: 0x5a3a2a,
-            roughness: 0.6,
-            metalness: 0.1,
-        });
-        const frameGeo = new THREE.BoxGeometry(1.7, 2.5, 0.15);
-        const frame = new THREE.Mesh(frameGeo, frameMat);
-        frame.position.set(0, 1.25, 0);
-        frame.castShadow = true;
-        doorGroup.add(frame);
-
-        // Door panel (the part that opens)
-        const doorPanel = new THREE.Group();
-        doorPanel.position.set(0, 0, 0.1);
-        doorGroup.add(doorPanel);
-
-        const doorMat = new THREE.MeshStandardMaterial({
-            color: 0x7a5a3a,
-            roughness: 0.5,
-            metalness: 0.1,
-            side: THREE.DoubleSide,
-        });
-        const doorGeo = new THREE.BoxGeometry(1.5, 2.3, 0.08);
-        const doorMesh = new THREE.Mesh(doorGeo, doorMat);
-        doorMesh.position.set(0, 1.15, 0);
-        doorMesh.castShadow = true;
-        doorPanel.add(doorMesh);
-
-        // Door handle
-        const handleMat = new THREE.MeshStandardMaterial({
-            color: 0xd4a54a,
-            roughness: 0.3,
-            metalness: 0.7,
-        });
-        const handle = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), handleMat);
-        handle.position.set(0.55, 1.2, 0.1);
-        doorPanel.add(handle);
-
-        // Door frame trim
-        const trimMat = new THREE.MeshStandardMaterial({
-            color: 0x6a4a2a,
-            roughness: 0.7,
-            metalness: 0.0,
-        });
-        for (let side of [
-                [-0.85, 0],
-                [0.85, 0],
-                [0, 1.25]
-            ]) {
-            const isTop = side[1] > 0;
-            const trim = new THREE.Mesh(
-                new THREE.BoxGeometry(isTop ? 1.7 : 0.1, isTop ? 0.1 : 2.5, 0.1),
-                trimMat
-            );
-            trim.position.set(side[0], side[1], 0.08);
-            doorGroup.add(trim);
-        }
-
-        // Door hinge line (decorative)
-        const hingeMat = new THREE.MeshStandardMaterial({
-            color: 0x8a7a5a,
-            roughness: 0.5,
-            metalness: 0.3,
-        });
-        for (let y of [0.4, 2.0]) {
-            const hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 8), hingeMat);
-            hinge.rotation.z = Math.PI / 2;
-            hinge.position.set(-0.75, y, 0.06);
-            doorGroup.add(hinge);
-        }
-
-        // ---- Windows ----
-        function createWindow(x, y, z, rotY = 0) {
-            const winGroup = new THREE.Group();
-            winGroup.position.set(x, y, z);
-            winGroup.rotation.y = rotY;
-            houseGroup.add(winGroup);
-
-            const frameMatW = new THREE.MeshStandardMaterial({
-                color: 0x8a7a6a,
-                roughness: 0.5,
-                metalness: 0.1,
-            });
-            const glassMat = new THREE.MeshStandardMaterial({
-                color: 0x88bbdd,
-                roughness: 0.05,
-                metalness: 0.1,
-                transparent: true,
-                opacity: 0.35,
-                envMapIntensity: 0.3,
-            });
-
-            const ww = 0.7,
-                wh = 0.9,
-                wd = 0.06;
-            // Frame
-            const f = new THREE.Mesh(new THREE.BoxGeometry(ww + 0.1, wh + 0.1, wd), frameMatW);
-            f.castShadow = true;
-            winGroup.add(f);
-            // Glass
-            const g = new THREE.Mesh(new THREE.BoxGeometry(ww - 0.1, wh - 0.1, wd * 0.5), glassMat);
-            g.position.z = 0.03;
-            winGroup.add(g);
-            // Cross
-            const crossMat = new THREE.MeshStandardMaterial({ color: 0x8a7a6a });
-            const hBar = new THREE.Mesh(new THREE.BoxGeometry(ww - 0.1, 0.03, wd * 0.6), crossMat);
-            hBar.position.z = 0.03;
-            winGroup.add(hBar);
-            const vBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, wh - 0.1, wd * 0.6), crossMat);
-            vBar.position.z = 0.03;
-            winGroup.add(vBar);
-
-            return winGroup;
-        }
-
-        // Windows on sides
-        createWindow(-houseWidth / 2 + 0.1, 1.6, -1.0, -Math.PI / 2);
-        createWindow(-houseWidth / 2 + 0.1, 1.6, 1.0, -Math.PI / 2);
-        createWindow(houseWidth / 2 - 0.1, 1.6, -1.0, Math.PI / 2);
-        createWindow(houseWidth / 2 - 0.1, 1.6, 1.0, Math.PI / 2);
-        // Back windows
-        createWindow(-1.2, 1.6, -houseDepth / 2 + 0.1, Math.PI);
-        createWindow(1.2, 1.6, -houseDepth / 2 + 0.1, Math.PI);
-
-        // ---- Trees ----
-        function createTree(x, z, scale = 1) {
-            const tree = new THREE.Group();
-            const trunkMat = new THREE.MeshStandardMaterial({
-                color: 0x5a3a2a,
-                roughness: 0.9,
-                metalness: 0.0,
-            });
-            const trunk = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.15 * scale, 0.25 * scale, 0.8 * scale, 8),
-                trunkMat
-            );
-            trunk.position.y = 0.4 * scale;
-            trunk.castShadow = true;
-            tree.add(trunk);
-
-            const leafMat = new THREE.MeshStandardMaterial({
-                color: 0x3a7a2a,
-                roughness: 0.8,
-                metalness: 0.0,
-            });
-            const leafMat2 = new THREE.MeshStandardMaterial({
-                color: 0x4a8a3a,
-                roughness: 0.8,
-                metalness: 0.0,
-            });
-            const crown1 = new THREE.Mesh(
-                new THREE.SphereGeometry(0.6 * scale, 7, 7),
-                leafMat
-            );
-            crown1.position.set(0, 0.9 * scale + 0.2 * scale, 0);
-            crown1.scale.y = 0.8;
-            crown1.castShadow = true;
-            tree.add(crown1);
-
-            const crown2 = new THREE.Mesh(
-                new THREE.SphereGeometry(0.5 * scale, 7, 7),
-                leafMat2
-            );
-            crown2.position.set(0.3 * scale, 1.1 * scale + 0.2 * scale, 0.2 * scale);
-            crown2.scale.y = 0.7;
-            crown2.castShadow = true;
-            tree.add(crown2);
-
-            const crown3 = new THREE.Mesh(
-                new THREE.SphereGeometry(0.45 * scale, 7, 7),
-                leafMat
-            );
-            crown3.position.set(-0.25 * scale, 1.0 * scale + 0.2 * scale, -0.2 * scale);
-            crown3.scale.y = 0.7;
-            crown3.castShadow = true;
-            tree.add(crown3);
-
-            tree.position.set(x, 0, z);
-            return tree;
-        }
-
-        scene.add(createTree(-4.5, -3.5, 1.2));
-        scene.add(createTree(5.0, -3.0, 1.0));
-        scene.add(createTree(-3.8, 4.5, 0.9));
-        scene.add(createTree(4.2, 4.0, 1.1));
-        scene.add(createTree(-5.5, 1.0, 0.8));
-
-        // ---- Small bushes ----
-        function createBush(x, z, s = 0.5) {
-            const bushMat = new THREE.MeshStandardMaterial({
-                color: 0x3a7a2a,
-                roughness: 0.9,
-                metalness: 0.0,
-            });
-            const bush = new THREE.Mesh(new THREE.SphereGeometry(s, 6, 6), bushMat);
-            bush.position.set(x, s * 0.6, z);
-            bush.scale.y = 0.7;
-            bush.castShadow = true;
-            scene.add(bush);
-            const bush2 = new THREE.Mesh(new THREE.SphereGeometry(s * 0.7, 6, 6), bushMat);
-            bush2.position.set(x + s * 0.6, s * 0.4, z + s * 0.4);
-            bush2.scale.y = 0.7;
-            bush2.castShadow = true;
-            scene.add(bush2);
-        }
-        createBush(-3.2, 3.2, 0.4);
-        createBush(3.5, 3.5, 0.35);
-        createBush(-3.5, -3.8, 0.45);
-        createBush(3.8, -3.5, 0.4);
-
-        // ============================================================
-        //  INTERIOR FURNITURE & DECOR
-        // ============================================================
-        const interiorGroup = new THREE.Group();
-        houseGroup.add(interiorGroup);
-
-        // ---- Table ----
-        const tableMat = new THREE.MeshStandardMaterial({
-            color: 0x6a4a3a,
-            roughness: 0.6,
-            metalness: 0.05,
-        });
-        const tableTop = new THREE.Mesh(
-            new THREE.BoxGeometry(1.4, 0.08, 0.9),
-            tableMat
-        );
-        tableTop.position.set(0.8, 0.7, -1.0);
-        tableTop.castShadow = true;
-        tableTop.receiveShadow = true;
-        interiorGroup.add(tableTop);
-
-        const legMat = new THREE.MeshStandardMaterial({
-            color: 0x5a3a2a,
-            roughness: 0.7,
-            metalness: 0.0,
-        });
-        for (let lx of [-0.55, 0.55]) {
-            for (let lz of [-0.35, 0.35]) {
-                const leg = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.04, 0.05, 0.62, 6),
-                    legMat
-                );
-                leg.position.set(0.8 + lx, 0.31, -1.0 + lz);
-                leg.castShadow = true;
-                interiorGroup.add(leg);
-            }
-        }
-
-        // ---- Chair ----
-        function createChair(x, z, rotY = 0) {
-            const chair = new THREE.Group();
-            const chairMat = new THREE.MeshStandardMaterial({
-                color: 0x7a5a4a,
-                roughness: 0.6,
-                metalness: 0.05,
-            });
-            const seat = new THREE.Mesh(
-                new THREE.BoxGeometry(0.5, 0.06, 0.5),
-                chairMat
-            );
-            seat.position.y = 0.45;
-            seat.castShadow = true;
-            seat.receiveShadow = true;
-            chair.add(seat);
-
-            const back = new THREE.Mesh(
-                new THREE.BoxGeometry(0.5, 0.4, 0.04),
-                chairMat
-            );
-            back.position.set(0, 0.7, -0.25);
-            back.castShadow = true;
-            chair.add(back);
-
-            for (let lx of [-0.2, 0.2]) {
-                for (let lz of [-0.2, 0.2]) {
-                    const leg = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.025, 0.03, 0.4, 6),
-                        new THREE.MeshStandardMaterial({ color: 0x5a3a2a })
-                    );
-                    leg.position.set(lx, 0.2, lz);
-                    leg.castShadow = true;
-                    chair.add(leg);
-                }
-            }
-            chair.position.set(x, 0, z);
-            chair.rotation.y = rotY;
-            interiorGroup.add(chair);
-            return chair;
-        }
-
-        createChair(0.0, -0.5, 0);
-        createChair(1.6, -0.5, 0);
-
-        // ---- Small side table ----
-        const sideMat = new THREE.MeshStandardMaterial({
-            color: 0x8a7a5a,
-            roughness: 0.5,
-            metalness: 0.05,
-        });
-        const sideTable = new THREE.Mesh(
-            new THREE.BoxGeometry(0.5, 0.06, 0.5),
-            sideMat
-        );
-        sideTable.position.set(-1.4, 0.45, 0.5);
-        sideTable.castShadow = true;
-        sideTable.receiveShadow = true;
-        interiorGroup.add(sideTable);
-
-        for (let lx of [-0.2, 0.2]) {
-            for (let lz of [-0.2, 0.2]) {
-                const leg = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.025, 0.03, 0.4, 6),
-                    new THREE.MeshStandardMaterial({ color: 0x5a3a2a })
-                );
-                leg.position.set(-1.4 + lx, 0.2, 0.5 + lz);
-                leg.castShadow = true;
-                interiorGroup.add(leg);
-            }
-        }
-
-        // ---- Rug ----
-        const rugMat = new THREE.MeshStandardMaterial({
-            color: 0x8a2a2a,
-            roughness: 0.9,
-            metalness: 0.0,
-            transparent: true,
-            opacity: 0.6,
-        });
-        const rug = new THREE.Mesh(
-            new THREE.PlaneGeometry(1.8, 1.2),
-            rugMat
-        );
-        rug.rotation.x = -Math.PI / 2;
-        rug.position.set(0.6, 0.03, -0.6);
-        rug.receiveShadow = true;
-        interiorGroup.add(rug);
-
-        // ---- Interior Lighting ----
-        function addInteriorLight(x, y, z, color = 0xffeedd, intensity = 0.8) {
-            const light = new THREE.PointLight(color, intensity, 6);
-            light.position.set(x, y, z);
-            light.castShadow = false;
-            interiorGroup.add(light);
-            interiorLights.push(light);
-            // Glow sphere
-            const glowMat = new THREE.MeshStandardMaterial({
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.3,
-                transparent: true,
-                opacity: 0.15,
-            });
-            const glow = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), glowMat);
-            glow.position.set(x, y, z);
-            interiorGroup.add(glow);
-            return light;
-        }
-
-        addInteriorLight(0, 2.6, -1, 0xffdd88, 1.0);
-        addInteriorLight(-1.8, 2.6, 1.5, 0xffcc77, 0.7);
-        addInteriorLight(1.8, 2.6, 1.5, 0xffcc77, 0.7);
-
-        // ============================================================
-        //  PICTURE FRAMES
-        // ============================================================
-        const frames = [];
-
-        function createPictureFrame(x, y, z, rotY, imgUrl, scale = 1, isGolden = false) {
-            const group = new THREE.Group();
-            group.position.set(x, y, z);
-            group.rotation.y = rotY;
-            interiorGroup.add(group);
-
-            const fw = 0.8 * scale;
-            const fh = 0.6 * scale;
-            const fd = 0.05 * scale;
-
-            // Frame material
-            let frameMatP;
-            if (isGolden) {
-                frameMatP = new THREE.MeshStandardMaterial({
-                    color: 0xd4a54a,
-                    roughness: 0.2,
-                    metalness: 0.8,
-                    emissive: 0xd4a54a,
-                    emissiveIntensity: 0.05,
-                });
-            } else {
-                frameMatP = new THREE.MeshStandardMaterial({
-                    color: 0x8a7a5a,
-                    roughness: 0.4,
-                    metalness: 0.3,
-                });
-            }
-
-            // Outer frame
-            const frameMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(fw, fh, fd),
-                frameMatP
-            );
-            frameMesh.castShadow = true;
-            frameMesh.receiveShadow = true;
-            group.add(frameMesh);
-
-            // Inner frame (bevel)
-            const innerMat = new THREE.MeshStandardMaterial({
-                color: isGolden ? 0xf5d78a : 0x9a8a7a,
-                roughness: 0.3,
-                metalness: isGolden ? 0.9 : 0.2,
-            });
-            const inner = new THREE.Mesh(
-                new THREE.BoxGeometry(fw - 0.1 * scale, fh - 0.1 * scale, fd * 0.5),
-                innerMat
-            );
-            inner.position.z = isGolden ? 0.035 * scale : 0.03 * scale;
-            group.add(inner);
-
-            // Image (using canvas texture or placeholder)
-            const imgMat = new THREE.MeshStandardMaterial({
-                map: null,
-                roughness: 0.3,
-                metalness: 0.0,
-                emissive: isGolden ? new THREE.Color(0xd4a54a) : new THREE.Color(0x000000),
-                emissiveIntensity: isGolden ? 0.05 : 0,
-            });
-
-            // Create a canvas with the image or placeholder
-            const imgCanvas = document.createElement('canvas');
-            imgCanvas.width = 512;
-            imgCanvas.height = 384;
-            const ctx = imgCanvas.getContext('2d');
-
-            // Draw placeholder or image
-            if (isGolden) {
-                // Golden frame content - birthday message rendered on canvas
-                const grad = ctx.createLinearGradient(0, 0, 512, 384);
-                grad.addColorStop(0, '#2a1a0a');
-                grad.addColorStop(0.5, '#3a2a1a');
-                grad.addColorStop(1, '#2a1a0a');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, 512, 384);
-
-                // Decorative border
-                ctx.strokeStyle = '#d4a54a';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(20, 20, 472, 344);
-
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#f5d78a';
-                ctx.font = 'bold 48px Georgia, serif';
-                ctx.fillText('🎉', 256, 80);
-                ctx.font = 'bold 44px Georgia, serif';
-                ctx.fillText('Happy', 256, 150);
-                ctx.font = 'bold 52px Georgia, serif';
-                ctx.fillText('Birthday!', 256, 220);
-                ctx.font = '20px Georgia, serif';
-                ctx.fillStyle = '#e8d5b0';
-                ctx.fillText('✨ May your day be filled with joy ✨', 256, 290);
-                ctx.font = '16px Georgia, serif';
-                ctx.fillStyle = '#c8b590';
-                ctx.fillText('with love & light', 256, 340);
-
-                // Sparkle overlay
-                for (let i = 0; i < 30; i++) {
-                    const sx = Math.random() * 512;
-                    const sy = Math.random() * 384;
-                    const size = 2 + Math.random() * 6;
-                    ctx.fillStyle = `rgba(255,215,0,${0.1 + Math.random() * 0.3})`;
-                    ctx.beginPath();
-                    ctx.arc(sx, sy, size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            } else {
-                // Regular frame - use a gradient placeholder or random image
-                const colors = ['#4a6a8a', '#6a4a6a', '#4a6a4a', '#8a6a4a', '#6a4a8a'];
-                const c = colors[Math.floor(Math.random() * colors.length)];
-                const c2 = colors[Math.floor(Math.random() * colors.length)];
-                const grad = ctx.createLinearGradient(0, 0, 512, 384);
-                grad.addColorStop(0, c);
-                grad.addColorStop(1, c2);
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, 512, 384);
-
-                // Some abstract shapes
-                for (let i = 0; i < 20; i++) {
-                    const x = Math.random() * 512;
-                    const y = Math.random() * 384;
-                    const r = 10 + Math.random() * 60;
-                    ctx.fillStyle = `rgba(255,255,255,${0.03 + Math.random() * 0.08})`;
-                    ctx.beginPath();
-                    ctx.arc(x, y, r, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                // A simple landscape or abstract
-                ctx.fillStyle = 'rgba(255,255,255,0.05)';
-                ctx.fillRect(0, 250, 512, 134);
-                for (let i = 0; i < 10; i++) {
-                    const x = i * 55 + Math.random() * 20;
-                    const h = 30 + Math.random() * 60;
-                    ctx.fillStyle = `rgba(255,255,255,${0.02 + Math.random() * 0.06})`;
-                    ctx.fillRect(x, 250 - h, 15 + Math.random() * 20, h);
-                }
-            }
-
-            const tex = new THREE.CanvasTexture(imgCanvas);
-            tex.anisotropy = 4;
-
-            const imgMesh = new THREE.Mesh(
-                new THREE.PlaneGeometry(fw - 0.12 * scale, fh - 0.12 * scale),
-                new THREE.MeshStandardMaterial({
-                    map: tex,
-                    roughness: 0.3,
-                    metalness: 0.0,
-                    emissive: isGolden ? new THREE.Color(0xd4a54a) : new THREE.Color(0x000000),
-                    emissiveIntensity: isGolden ? 0.05 : 0,
-                })
-            );
-            imgMesh.position.z = fd * 0.5 + 0.005;
-            group.add(imgMesh);
-
-            // Store frame data for interaction
-            const frameData = {
-                group,
-                mesh: frameMesh,
-                imgMesh,
-                isGolden,
-                baseScale: scale,
-                x,
-                y,
-                z,
-                rotY,
-                glowIntensity: isGolden ? 0.3 : 0.05,
-                pulsePhase: Math.random() * Math.PI * 2,
-            };
-            frames.push(frameData);
-
-            // If golden, add glow sprite
-            if (isGolden) {
-                const spriteMap = (() => {
-                    const c = document.createElement('canvas');
-                    c.width = 128;
-                    c.height = 128;
-                    const cx = c.getContext('2d');
-                    const grad = cx.createRadialGradient(64, 64, 0, 64, 64, 64);
-                    grad.addColorStop(0, 'rgba(255,215,0,0.6)');
-                    grad.addColorStop(0.3, 'rgba(255,200,100,0.3)');
-                    grad.addColorStop(1, 'rgba(255,200,100,0)');
-                    cx.fillStyle = grad;
-                    cx.fillRect(0, 0, 128, 128);
-                    return new THREE.CanvasTexture(c);
-                })();
-                const spriteMat = new THREE.SpriteMaterial({
-                    map: spriteMap,
-                    transparent: true,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false,
-                });
-                const sprite = new THREE.Sprite(spriteMat);
-                sprite.scale.set(2.5 * scale, 2.5 * scale, 1);
-                sprite.position.z = 0.1 * scale;
-                group.add(sprite);
-                frameData.sprite = sprite;
-            }
-
-            return group;
-        }
-
-        // Place frames on walls
-        // Back wall frames
-        createPictureFrame(-1.2, 1.6, -houseDepth / 2 + 0.08, 0, null, 1.0, false);
-        createPictureFrame(1.2, 1.6, -houseDepth / 2 + 0.08, 0, null, 1.0, false);
-
-        // Left wall frames
-        createPictureFrame(-houseWidth / 2 + 0.08, 1.6, -1.2, -Math.PI / 2, null, 0.9, false);
-        createPictureFrame(-houseWidth / 2 + 0.08, 1.0, 0.6, -Math.PI / 2, null, 0.9, false);
-
-        // Right wall frames
-        createPictureFrame(houseWidth / 2 - 0.08, 1.6, -1.2, Math.PI / 2, null, 0.9, false);
-        createPictureFrame(houseWidth / 2 - 0.08, 1.0, 0.6, Math.PI / 2, null, 0.9, false);
-
-        // ---- GOLDEN FRAME (final surprise) ----
-        const goldenFrame = createPictureFrame(
-            0, 1.6, -houseDepth / 2 + 0.15,
-            0, null, 1.8, true
-        );
-        // Store reference for animation
-        const goldenFrameData = frames[frames.length - 1];
-
-        // ============================================================
-        //  PARTICLE SYSTEMS (Final Surprise)
-        // ============================================================
-        const particleSystems = [];
-
-        function createParticleSystem(count, color, size, spread, yRange, shape = 'sphere', speed = 0.5) {
-            const geo = new THREE.BufferGeometry();
-            const positions = new Float32Array(count * 3);
-            const velocities = [];
-            const basePositions = [];
-
-            for (let i = 0; i < count; i++) {
-                let x, y, z;
-                if (shape === 'sphere') {
-                    const theta = Math.random() * Math.PI * 2;
-                    const phi = Math.acos(2 * Math.random() - 1);
-                    const r = Math.random() * spread;
-                    x = r * Math.sin(phi) * Math.cos(theta);
-                    y = r * Math.cos(phi) + yRange[0] + (yRange[1] - yRange[0]) * 0.5;
-                    z = r * Math.sin(phi) * Math.sin(theta);
-                } else if (shape === 'heart') {
-                    // Heart shape distribution
-                    const t = Math.random() * Math.PI * 2;
-                    const r = spread * 0.3 * (1 + Math.random() * 0.5);
-                    const hx = 16 * Math.pow(Math.sin(t), 3);
-                    const hy = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-                    x = hx * r * 0.03;
-                    y = hy * r * 0.03 + yRange[0] + (yRange[1] - yRange[0]) * 0.5;
-                    z = (Math.random() - 0.5) * spread * 0.4;
-                } else {
-                    x = (Math.random() - 0.5) * spread;
-                    y = yRange[0] + Math.random() * (yRange[1] - yRange[0]);
-                    z = (Math.random() - 0.5) * spread;
-                }
-                positions[i * 3] = x;
-                positions[i * 3 + 1] = y;
-                positions[i * 3 + 2] = z;
-                basePositions.push({ x, y, z });
-                velocities.push({
-                    x: (Math.random() - 0.5) * speed * 0.3,
-                    y: 0.2 + Math.random() * speed * 0.5,
-                    z: (Math.random() - 0.5) * speed * 0.3,
-                });
-            }
-
-            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const mat = new THREE.PointsMaterial({
-                color: color,
-                size: size,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-                sizeAttenuation: true,
-            });
-
-            const points = new THREE.Points(geo, mat);
-            points.position.set(0, 0, -houseDepth / 2 + 0.5);
-
-            const system = {
-                points,
-                velocities,
-                basePositions,
-                count,
-                spread,
-                yRange,
-                speed,
-                life: 0,
-                active: false,
-            };
-            particleSystems.push(system);
-            return system;
-        }
-
-        // Create multiple particle systems for the finale
-        const heartParticles = createParticleSystem(80, 0xff4466, 0.12, 2.5, [0.5, 3.5], 'heart', 0.6);
-        const sparkleParticles = createParticleSystem(150, 0xffdd44, 0.06, 3.0, [0.5, 4.0], 'sphere', 0.4);
-        const goldenParticles = createParticleSystem(100, 0xd4a54a, 0.08, 2.8, [0.5, 3.8], 'sphere', 0.5);
-        const confettiParticles = createParticleSystem(120, 0xff6688, 0.1, 3.2, [0.5, 4.2], 'sphere', 0.7);
-
-        // Add all particle systems to the scene (hidden initially)
-        particleSystems.forEach(sys => {
-            sys.points.visible = false;
-            interiorGroup.add(sys.points);
-        });
-
-        // ---- Floating hearts (ambient) ----
-        const ambientHearts = [];
-        for (let i = 0; i < 15; i++) {
-            const h = createParticleSystem(1, 0xff4466, 0.15, 0.5, [0.5, 3.5], 'heart', 0.3);
-            h.points.position.set(
-                (Math.random() - 0.5) * 4,
-                0.5 + Math.random() * 2.5,
-                (Math.random() - 0.5) * 4 - 1
-            );
-            h.points.visible = true;
-            h.active = true;
-            h.life = Math.random() * 100;
-            h.speed = 0.2 + Math.random() * 0.3;
-            ambientHearts.push(h);
-            interiorGroup.add(h.points);
-        }
-
-        // ============================================================
-        //  FIRST-PERSON CONTROLS (custom)
-        // ============================================================
-        let fpControls = {
-            enabled: false,
-            yaw: 0,
-            pitch: 0,
-            velocity: new THREE.Vector3(0, 0, 0),
-            speed: 3.0,
-            isLocked: false,
-        };
-
-        // Mouse look
-        let isPointerLocked = false;
-        let mouseDown = false;
-        let mouseX = 0,
-            mouseY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            if (!fpControls.enabled) return;
-            if (document.pointerLockElement === renderer.domElement) {
-                fpControls.yaw -= e.movementX * 0.002;
-                fpControls.pitch -= e.movementY * 0.002;
-                fpControls.pitch = Math.max(-1.2, Math.min(1.2, fpControls.pitch));
-            }
-        });
-
-        document.addEventListener('click', () => {
-            if (fpControls.enabled && !isPointerLocked) {
-                renderer.domElement.requestPointerLock?.();
-            }
-        });
-
-        document.addEventListener('pointerlockchange', () => {
-            isPointerLocked = document.pointerLockElement === renderer.domElement;
-            fpControls.isLocked = isPointerLocked;
-        });
-
-        // Keyboard
-        const keys = { w: false, a: false, s: false, d: false };
-        document.addEventListener('keydown', (e) => {
-            const k = e.key.toLowerCase();
-            if (k in keys) keys[k] = true;
-            if (k === ' ' && fpControls.enabled) {
-                e.preventDefault();
-            }
-        });
-        document.addEventListener('keyup', (e) => {
-            const k = e.key.toLowerCase();
-            if (k in keys) keys[k] = false;
-        });
-
-        // Mobile joystick
-        let joystickActive = false;
-        let joystickDX = 0,
-            joystickDY = 0;
-
-        if (joystickArea) {
-            const handleTouch = (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                if (!touch) { joystickActive = false;
-                    joystickDX = 0;
-                    joystickDY = 0; return; }
-                const rect = joystickArea.getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
-                const dx = touch.clientX - cx;
-                const dy = touch.clientY - cy;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                const maxDist = rect.width / 2 - 10;
-                const clamped = Math.min(dist, maxDist);
-                const angle = Math.atan2(dy, dx);
-                const normX = Math.cos(angle) * (clamped / maxDist);
-                const normY = Math.sin(angle) * (clamped / maxDist);
-                joystickDX = normX;
-                joystickDY = normY;
-                joystickActive = true;
-                joystickKnob.style.transform = `translate(${normX * maxDist}px, ${normY * maxDist}px)`;
-            };
-
-            const resetJoystick = () => {
-                joystickActive = false;
-                joystickDX = 0;
-                joystickDY = 0;
-                joystickKnob.style.transform = 'translate(0,0)';
-            };
-
-            joystickArea.addEventListener('touchstart', handleTouch, { passive: false });
-            joystickArea.addEventListener('touchmove', handleTouch, { passive: false });
-            joystickArea.addEventListener('touchend', resetJoystick, { passive: false });
-            joystickArea.addEventListener('touchcancel', resetJoystick, { passive: false });
-        }
-
-        // ============================================================
-        //  DOOR INTERACTION
-        // ============================================================
-        let doorOpen = false;
-
-        function openDoor() {
-            if (doorOpen || isTransitioning) return;
-            doorOpen = true;
-            isTransitioning = true;
-
-            // Animate door opening (rotate on Y axis)
-            gsap.to(doorPanel.rotation, {
-                y: -Math.PI / 1.8,
-                duration: 1.8,
-                ease: 'power3.inOut',
-            });
-
-            // Animate door handle slightly
-            gsap.to(handle.position, {
-                x: 0.45,
-                z: 0.2,
-                duration: 1.2,
-                ease: 'power2.out',
-            });
-
-            // Hide ENTER button
-            enterBtn.classList.remove('visible');
-
-            // Camera transition: move from outside to inside
-            const startPos = camera.position.clone();
-            const startTarget = orbitControls.target.clone();
-
-            // Target position just inside the door
-            const endPos = new THREE.Vector3(0.2, 1.2, houseDepth / 2 - 0.8);
-            const endTarget = new THREE.Vector3(0, 1.2, -1);
-
-            // Animate camera
-            gsap.to(camera.position, {
-                x: endPos.x,
-                y: endPos.y,
-                z: endPos.z,
-                duration: 2.2,
-                ease: 'power2.inOut',
-                onUpdate: () => {
-                    // Update orbit controls target to follow
-                    const t = gsap.utils.interpolate(0, 1, gsap.utils.clamp(0, 1, (camera.position.x - startPos.x) / (
-                        endPos.x - startPos.x + 0.001)));
-                    orbitControls.target.lerpVectors(startTarget, endTarget, t);
-                    orbitControls.update();
-                },
-                onComplete: () => {
-                    // Switch to first-person mode
-                    isInside = true;
-                    orbitControls.enabled = false;
-                    orbitControls.autoRotate = false;
-
-                    // Set up first-person
-                    fpControls.enabled = true;
-                    fpControls.yaw = 0;
-                    fpControls.pitch = -0.05;
-
-                    // Lock pointer
-                    renderer.domElement.requestPointerLock?.();
-
-                    // Update camera orientation
-                    updateFPCamera();
-
-                    isTransitioning = false;
-
-                    // Show HUD hint
-                    hudHint.classList.add('visible');
-
-                    // Trigger the final surprise after a delay
-                    setTimeout(() => {
-                        triggerFinalSurprise();
-                    }, 3000);
-                }
-            });
-
-            // Also animate the orbit target
-            gsap.to(orbitControls.target, {
-                x: endTarget.x,
-                y: endTarget.y,
-                z: endTarget.z,
-                duration: 2.2,
-                ease: 'power2.inOut',
-            });
-        }
-
-        enterBtn.addEventListener('click', openDoor);
-        // Also allow tap on the door itself via raycasting? We'll use the button.
-
-        // ============================================================
-        //  FINAL SURPRISE
-        // ============================================================
-        let surpriseTriggered = false;
-
-        function triggerFinalSurprise() {
-            if (surpriseTriggered) return;
-            surpriseTriggered = true;
-
-            // Animate golden frame
-            const gd = goldenFrameData;
-            gsap.to(gd.group.position, {
-                z: gd.group.position.z + 0.3,
-                duration: 1.5,
-                ease: 'back.out(1.2)',
-            });
-
-            gsap.to(gd.group.scale, {
-                x: 1.1,
-                y: 1.1,
-                z: 1.1,
-                duration: 1.5,
-                ease: 'back.out(1.2)',
-            });
-
-            // Pulse glow
-            gsap.to(gd.mesh.material, {
-                emissiveIntensity: 0.3,
-                duration: 0.8,
-                yoyo: true,
-                repeat: -1,
-                ease: 'sine.inOut',
-            });
-
-            // Activate particle systems
-            particleSystems.forEach((sys, idx) => {
-                setTimeout(() => {
-                    sys.points.visible = true;
-                    sys.active = true;
-                    sys.life = 0;
-                    // Randomize positions
-                    const pos = sys.points.geometry.attributes.position;
-                    for (let i = 0; i < sys.count; i++) {
-                        const base = sys.basePositions[i];
-                        pos.array[i * 3] = base.x + (Math.random() - 0.5) * 0.5;
-                        pos.array[i * 3 + 1] = base.y + (Math.random() - 0.5) * 0.5;
-                        pos.array[i * 3 + 2] = base.z + (Math.random() - 0.5) * 0.5;
-                    }
-                    pos.needsUpdate = true;
-                }, idx * 200);
-            });
-
-            // Confetti burst
-            const confettiSys = particleSystems[3];
-            if (confettiSys) {
-                const pos = confettiSys.points.geometry.attributes.position;
-                for (let i = 0; i < confettiSys.count; i++) {
-                    pos.array[i * 3] = (Math.random() - 0.5) * 4;
-                    pos.array[i * 3 + 1] = 0.5 + Math.random() * 3.5;
-                    pos.array[i * 3 + 2] = (Math.random() - 0.5) * 4 - 0.5;
-                }
-                pos.needsUpdate = true;
-                confettiSys.points.visible = true;
-                confettiSys.active = true;
-            }
-
-            // Play a subtle camera move
-            gsap.to(camera.position, {
-                x: camera.position.x + 0.3,
-                duration: 2.0,
-                ease: 'sine.inOut',
-                yoyo: true,
-                repeat: 1,
-            });
-        }
-
-        // ============================================================
-        //  UPDATE FUNCTIONS
-        // ============================================================
-        function updateFPCamera() {
-            const euler = new THREE.Euler(fpControls.pitch, fpControls.yaw, 0, 'YXZ');
-            camera.quaternion.setFromEuler(euler);
-        }
-
-        function updateFPControls(delta) {
-            if (!fpControls.enabled || isTransitioning) return;
-
-            // Get movement direction
-            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(
-                new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
-            );
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(
-                new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
-            );
-
-            let moveX = 0,
-                moveZ = 0;
-            if (keys.w) { moveX += forward.x;
-                moveZ += forward.z; }
-            if (keys.s) { moveX -= forward.x;
-                moveZ -= forward.z; }
-            if (keys.a) { moveX -= right.x;
-                moveZ -= right.z; }
-            if (keys.d) { moveX += right.x;
-                moveZ += right.z; }
-
-            // Joystick input
-            if (joystickActive) {
-                const jf = new THREE.Vector3(0, 0, -joystickDY).applyQuaternion(
-                    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
-                );
-                const jr = new THREE.Vector3(joystickDX, 0, 0).applyQuaternion(
-                    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, fpControls.yaw, 0))
-                );
-                moveX += jf.x + jr.x;
-                moveZ += jf.z + jr.z;
-            }
-
-            // Normalize
-            const len = Math.sqrt(moveX * moveX + moveZ * moveZ);
-            if (len > 0) {
-                moveX /= len;
-                moveZ /= len;
-            }
-
-            const speed = fpControls.speed * delta;
-            const newPos = camera.position.clone();
-            newPos.x += moveX * speed;
-            newPos.z += moveZ * speed;
-
-            // Collision with walls (simple room bounds)
-            const margin = 0.3;
-            const halfW = houseWidth / 2 - margin;
-            const halfD = houseDepth / 2 - margin;
-            newPos.x = Math.max(-halfW, Math.min(halfW, newPos.x));
-            newPos.z = Math.max(-halfD, Math.min(halfD, newPos.z));
-
-            camera.position.copy(newPos);
-            camera.position.y = 1.2; // fixed height
-
-            // Update camera rotation
-            updateFPCamera();
-
-            // Update golden frame interaction - scale based on distance
-            const gd = goldenFrameData;
-            if (gd) {
-                const dist = camera.position.distanceTo(
-                    new THREE.Vector3(gd.x, gd.y, gd.z)
-                );
-                const scaleFactor = Math.max(1, 3.5 - dist * 0.3);
-                const s = Math.min(2.0, Math.max(1.0, scaleFactor));
-                // Smoothly interpolate scale
-                const current = gd.group.scale.x;
-                const target = s * 0.9;
-                const newS = current + (target - current) * 0.05;
-                gd.group.scale.set(newS, newS, newS);
-            }
-        }
-
-        // ============================================================
-        //  ANIMATION LOOP
-        // ============================================================
-        const clock = new THREE.Clock();
-
-        function animate() {
-            const delta = Math.min(clock.getDelta(), 0.05);
-            const elapsed = clock.elapsedTime;
-
-            // Update orbit controls if outside
-            if (!isInside && orbitControls.enabled) {
-                orbitControls.update();
-            }
-
-            // Update first-person controls
-            if (fpControls.enabled) {
-                updateFPControls(delta);
-            }
-
-            // Animate picture frames (subtle glow)
-            frames.forEach((f, i) => {
-                const pulse = Math.sin(elapsed * 0.8 + f.pulsePhase) * 0.5 + 0.5;
-                if (f.isGolden) {
-                    // Golden frame gets extra glow
-                    const intensity = 0.05 + pulse * 0.25;
-                    f.mesh.material.emissiveIntensity = intensity;
-                    if (f.sprite) {
-                        const s = 2.0 + pulse * 0.8;
-                        f.sprite.scale.set(s, s, 1);
-                        f.sprite.material.opacity = 0.3 + pulse * 0.4;
-                    }
-                } else {
-                    // Regular frames subtle glow based on distance
-                    const dist = camera.position.distanceTo(
-                        new THREE.Vector3(f.x, f.y, f.z)
-                    );
-                    const glow = Math.max(0, 1 - dist / 6) * 0.15;
-                    f.mesh.material.emissiveIntensity = glow + 0.02;
-                }
-            });
-
-            // Update particle systems
-            particleSystems.forEach(sys => {
-                if (!sys.active || !sys.points.visible) return;
-                sys.life += delta;
-                const pos = sys.points.geometry.attributes.position;
-                const arr = pos.array;
-                for (let i = 0; i < sys.count; i++) {
-                    const idx = i * 3;
-                    const base = sys.basePositions[i];
-                    // Float up and drift
-                    arr[idx + 1] += sys.velocities[i].y * delta * 0.5;
-                    arr[idx] += Math.sin(elapsed + i) * delta * 0.1;
-                    arr[idx + 2] += Math.cos(elapsed * 0.7 + i * 0.5) * delta * 0.1;
-
-                    // Reset if too high
-                    if (arr[idx + 1] > sys.yRange[1] + 0.5) {
-                        arr[idx + 1] = sys.yRange[0] + Math.random() * 0.5;
-                        arr[idx] = base.x + (Math.random() - 0.5) * 0.5;
-                        arr[idx + 2] = base.z + (Math.random() - 0.5) * 0.5;
-                    }
-                }
-                pos.needsUpdate = true;
-
-                // Fade particles in/out
-                const lifeNorm = Math.min(1, sys.life / 1.5);
-                sys.points.material.opacity = Math.min(1, lifeNorm * 0.9);
-            });
-
-            // Update ambient hearts
-            ambientHearts.forEach((h, idx) => {
-                if (!h.active) return;
-                h.life += delta;
-                const pos = h.points.geometry.attributes.position;
-                const arr = pos.array;
-                // Gentle floating
-                arr[1] += Math.sin(elapsed * h.speed + idx) * delta * 0.15;
-                arr[0] += Math.sin(elapsed * 0.5 + idx * 1.3) * delta * 0.06;
-                arr[2] += Math.cos(elapsed * 0.4 + idx * 0.9) * delta * 0.06;
-                // Bounds
-                if (arr[1] > 3.5) arr[1] = 0.5;
-                if (arr[1] < 0.3) arr[1] = 3.5;
-                if (arr[0] > 2.2) arr[0] = -2.2;
-                if (arr[0] < -2.2) arr[0] = 2.2;
-                if (arr[2] > 1.5) arr[2] = -3.5;
-                if (arr[2] < -3.5) arr[2] = 1.5;
-                pos.needsUpdate = true;
-                // Opacity pulse
-                h.points.material.opacity = 0.4 + Math.sin(elapsed * 0.6 + idx) * 0.2;
-            });
-
-            renderer.render(scene, camera);
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        // ============================================================
-        //  RESIZE
-        // ============================================================
-        window.addEventListener('resize', () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
-        });
-
-        // ============================================================
-        //  KEYBOARD SHORTCUT: SPACE to trigger surprise (debug)
-        // ============================================================
-        document.addEventListener('keydown', (e) => {
-            if (e.key === ' ' && isInside && !surpriseTriggered) {
-                e.preventDefault();
-                triggerFinalSurprise();
-            }
-        });
-
-        // ============================================================
-        //  INITIAL LOADING COMPLETE
-        // ============================================================
-        console.log('🎉 Happy Birthday! Welcome to the 3D Surprise House!');
-        console.log('✨ Walk inside and discover the golden frame.');
-
-        // Expose some things for debugging
-        window.__scene = scene;
-        window.__camera = camera;
-        window.__house = houseGroup;
-
-        // ============================================================
-        //  IMAGE REPLACEMENT GUIDE (in comments)
-        // ============================================================
-        /*
-         *  TO REPLACE PHOTOS IN FRAMES:
-         *  1. Add your images to an 'assets' folder in the same directory.
-         *  2. In the createPictureFrame calls, pass the image URL as the 6th parameter.
-         *  3. Example: createPictureFrame(x, y, z, rotY, '/assets/photo1.jpg', 1.0, false)
-         *  4. The code will load and display your image.
-         *  5. For the golden frame, the message is rendered on canvas - you can modify
-         *     the text in the isGolden section of createPictureFrame.
-         */
-        console.log('📸 To add your own photos: pass an image URL to createPictureFrame()');
-    </script>
-</body>
-</html>
+        frontRight.cast
