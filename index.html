@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Sifen - Inside</title>
+    <title>3D House - Two Photos</title>
 
     <!-- ===== STYLES ===== -->
     <style>
@@ -934,6 +934,9 @@
         // ============================================================
         const frames = []; // will store all frame data including final two
 
+        // ============================================================
+        //  UPDATED: createPictureFrame with fixed z-ordering
+        // ============================================================
         function createPictureFrame(x, y, z, rotY, imgUrl = null, scale = 1, isGolden = false) {
             const group = new THREE.Group();
             group.position.set(x, y, z);
@@ -944,6 +947,7 @@
             const fh = 0.6 * scale;
             const fd = 0.05 * scale;
 
+            // Outer frame (back)
             let frameMatP;
             if (isGolden) {
                 frameMatP = new THREE.MeshStandardMaterial({
@@ -965,10 +969,12 @@
                 new THREE.BoxGeometry(fw, fh, fd),
                 frameMatP
             );
+            frameMesh.position.z = 0; // at the back
             frameMesh.castShadow = true;
             frameMesh.receiveShadow = true;
             group.add(frameMesh);
 
+            // Inner decorative border (mat) - slightly smaller and placed behind image
             const innerMat = new THREE.MeshStandardMaterial({
                 color: isGolden ? 0xf5d78a : 0x9a8a7a,
                 roughness: 0.3,
@@ -978,10 +984,11 @@
                 new THREE.BoxGeometry(fw - 0.1 * scale, fh - 0.1 * scale, fd * 0.5),
                 innerMat
             );
-            inner.position.z = isGolden ? 0.035 * scale : 0.03 * scale;
+            // Place inner behind the image, but in front of the outer frame
+            inner.position.z = 0.02 * scale; // slight forward
             group.add(inner);
 
-            // Image plane
+            // Image plane (in front of inner)
             const imgMesh = new THREE.Mesh(
                 new THREE.PlaneGeometry(fw - 0.12 * scale, fh - 0.12 * scale),
                 new THREE.MeshStandardMaterial({
@@ -990,9 +997,11 @@
                     emissive: isGolden ? new THREE.Color(0xd4a54a) : new THREE.Color(0x000000),
                     emissiveIntensity: isGolden ? 0.05 : 0,
                     color: 0xffffff,
+                    side: THREE.DoubleSide, // show from both sides
                 })
             );
-            imgMesh.position.z = fd * 0.5 + 0.005;
+            // Place image in front of inner
+            imgMesh.position.z = 0.04 * scale; // further forward
             group.add(imgMesh);
 
             // Load image if URL provided
@@ -1001,9 +1010,10 @@
                 loader.load(imgUrl, (tex) => {
                     imgMesh.material.map = tex;
                     imgMesh.material.needsUpdate = true;
+                    console.log(`✅ Image loaded: ${imgUrl}`);
                 }, undefined, (err) => {
-                    console.warn('Failed to load image:', imgUrl);
-                    // fallback: draw a placeholder
+                    console.warn(`❌ Failed to load image: ${imgUrl}`, err);
+                    // Fallback: draw a placeholder
                     const canvas = document.createElement('canvas');
                     canvas.width = 512;
                     canvas.height = 384;
@@ -1011,18 +1021,20 @@
                     ctx.fillStyle = '#2a1a0a';
                     ctx.fillRect(0, 0, 512, 384);
                     ctx.fillStyle = '#e8d5b0';
-                    ctx.font = '24px Georgia';
+                    ctx.font = '28px Georgia';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('📷', 256, 180);
-                    ctx.font = '16px Georgia';
-                    ctx.fillText('Image not found', 256, 230);
+                    ctx.fillText('📷', 256, 160);
+                    ctx.font = '18px Georgia';
+                    ctx.fillText('Image not found', 256, 220);
+                    ctx.font = '14px Georgia';
+                    ctx.fillText(imgUrl, 256, 260);
                     const fallbackTex = new THREE.CanvasTexture(canvas);
                     imgMesh.material.map = fallbackTex;
                     imgMesh.material.needsUpdate = true;
                 });
             } else {
-                // Decorative frames with canvas art
+                // Decorative frames with random art
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
                 canvas.height = 384;
@@ -1065,7 +1077,7 @@
             };
             frames.push(frameData);
 
-            // If golden, add glow sprite
+            // If golden, add glow sprite (placed at image plane z)
             if (isGolden) {
                 const spriteMap = (() => {
                     const c = document.createElement('canvas');
@@ -1088,7 +1100,7 @@
                 });
                 const sprite = new THREE.Sprite(spriteMat);
                 sprite.scale.set(2.5 * scale, 2.5 * scale, 1);
-                sprite.position.z = 0.1 * scale;
+                sprite.position.z = 0.04 * scale; // same as image
                 group.add(sprite);
                 frameData.sprite = sprite;
             }
@@ -1107,7 +1119,6 @@
         // ============================================================
         //  TWO FINAL IMAGES ON THE BACK WALL (photo1.jpg and photo2.jpg)
         // ============================================================
-        // They will be golden frames with glow and effects
         const backZ = -houseDepth / 2 + 0.15;
         const yPos = 1.6;
         const scale = 1.4;
@@ -1362,8 +1373,6 @@
                     updateFPCamera();
                     isTransitioning = false;
                     hudHint.classList.add('visible');
-
-                    // Effects will be triggered by proximity
                 }
             });
 
